@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .app {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <ul>
+    <li>User 1</li>
+    <li>User 2</li>
+    <li>User 3</li>
+  </ul>
+
+  <form action="/create-user" method="POST">
+    <div>
+      <label for="username">Username</label>
+      <input type="text" id="username">
+    </div>
+
+    <button type="submit">Add user</button>
+  </form>
+</body>
+</html>
