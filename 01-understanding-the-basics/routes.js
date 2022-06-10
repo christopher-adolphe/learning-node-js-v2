@@ -1,3 +1,5 @@
+const users = ['Angela', 'Paul'];
+
 const requestHandler = (request, response) => {
   const { url, method } = request;
   const pageStart = `
@@ -67,17 +69,17 @@ const requestHandler = (request, response) => {
       </body>
     </html>
   `;
-  const users = ['User 1', 'User 2'];
+
   let bodyContent;
 
   if (url === '/') {
     bodyContent = `
-      <h1>Welcome to NodeJS Basics</h1>
+      <h1>👋 Welcome to NodeJS Basics 👋</h1>
 
       <form class="form" action="/create-user" method="POST">
         <div class="form__group">
           <label for="username">Username:</label>
-          <input type="text" id="username">
+          <input type="text" id="username" name="username" />
         </div>
 
         <button type="submit">Add user</button>
@@ -92,6 +94,7 @@ const requestHandler = (request, response) => {
       ${pageEnd}
     `;
 
+    response.setHeader('Content-Type', 'text/html');
     response.write(htmlPage);
 
     return response.end();
@@ -114,6 +117,7 @@ const requestHandler = (request, response) => {
       ${pageEnd}
     `;
 
+    response.setHeader('Content-Type', 'text/html');
     response.write(htmlPage);
 
     return response.end();
@@ -123,32 +127,38 @@ const requestHandler = (request, response) => {
     const body = [];
     let newUser = '';
 
-    const htmlPage = `
-      ${pageStart}
-
-      ${bodyContent}
-      
-      ${pageEnd}
-    `;
-
     request.on('data', (chunk) => {
       body.push(chunk);
     });
 
-    resquest.on('end', () => {
+    request.on('end', () => {
       const parsedBody = Buffer.concat(body).toString();
       newUser = parsedBody.split('=')[1];
 
-      bodyContent = `
-        <h1>New user ${newUser} successfully created</h1>
-      `;
-
       users.push(newUser);
 
+      bodyContent = `
+        <h1>🎉 New user ${newUser} successfully created 🎉</h1>
+
+        <p>Click here to <a href="/users">view users list</a>.</p>
+      `;
+
+      const htmlPage = `
+        ${pageStart}
+
+        ${bodyContent}
+        
+        ${pageEnd}
+      `;
+
+      response.setHeader('Content-Type', 'text/html');
       response.write(htmlPage);
+      return response.end();
     });
 
-    return response.end();
+    // response.statusCode = 302;
+    // response.setHeader('Location', '/');
+    // response.end();
   }
 };
 
