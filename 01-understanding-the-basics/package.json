@@ -1,0 +1,23 @@
+{
+  "name": "01-understanding-the-basics",
+  "version": "1.0.0",
+  "description": "Learning the basics of Node.js",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/christopher-adolphe/learning-node-js-v2.git"
+  },
+  "author": "Christopher Adolphe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/christopher-adolphe/learning-node-js-v2/issues"
+  },
+  "homepage": "https://github.com/christopher-adolphe/learning-node-js-v2#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  }
+}
