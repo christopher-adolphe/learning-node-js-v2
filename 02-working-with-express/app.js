@@ -1,6 +1,12 @@
 // Importing the `express` module
 const express = require('express');
 
+// Importing router middleware
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+
+const { pageStart, pageEnd } = require('./constants');
+
 /**
  * Executing `express()` as a function creates
  * a new instance of an `express` app which then
@@ -8,6 +14,17 @@ const express = require('express');
  * Express.js framework offers
  */
 const app = express();
+
+/**
+ * Using the `urlencoded()` method to parse the
+ * body of incoming requests. The `urlencoded()`
+ * method is a built-in middleware function which
+ * is responsible to parse the body of the request
+ * object. Internally it calls the `next()` function
+ * to pass control to the next middleware function
+ * down the request processing pipeline
+ */
+app.use(express.urlencoded({ extended: true }));
 
 /**
  * Using the `use()` method to mount a middleware
@@ -31,8 +48,8 @@ app.use((request, response, next) => {
    * All middleware functions received a `next()` function as
    * parameter from Express.js. If a middleware function only
    * handles some business logic without sending a response,
-   * then it need to execute the `next()` function to pass
-   * control to the next middleware function in the request
+   * then it needs to execute the `next()` function to pass
+   * control to the next middleware function down the request
    * processing pipeline
   */
   next();
@@ -44,15 +61,64 @@ app.use((request, response, next) => {
   next();
 });
 
-app.use((request, response, next) => {
-  console.log('Middleware 3');
+app.use('/users', (request, response, next) => {
+  console.log('User Middleware');
 
-  /**
-   * Using the `send()` method of the `response` object to
-   * terminate the request-response cycle and send a response
-   * to the client
-  */
-  response.send('<h1>Hello from Express.js</h1>');
+  const users = [
+    {
+      id: 156,
+      username: 'Josh'
+    },
+    {
+      id: 145,
+      username: 'Angela'
+    },
+    {
+      id: 136,
+      username: 'Peter'
+    }
+  ];
+
+  response.send(JSON.stringify(users));
+});
+
+/**
+ * Mounting the router middleware functions
+ * in the main `Express` app. When mounting
+ * router middleware in the `Express` app, we
+ * can provide the common segment of our routes
+ * i.e "/admin" to the `use()` method so that
+ * we don't need to specify it of each and every
+ * route that we define and it will also act as
+ * a filter such that the middleware functions
+ * are executed only when common segment match
+*/
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
+
+/**
+ * Mounting a middleware functions as catch all
+ * routes
+*/
+app.use((request, response, next) => {
+  bodyContent = `
+    <h1>😵 Page not found 😵</h1>
+
+    <p>Sorry, the requestd path does not exit.</p>
+    <p>Click <a href="/">here</a> to go back to the home page.</p>
+  `;
+
+  const htmlPage = `
+    ${pageStart}
+
+    ${bodyContent}
+    
+    ${pageEnd}
+  `;
+
+  response
+    .status(404)
+    .send(htmlPage);
 });
 
 app.listen(3000);
