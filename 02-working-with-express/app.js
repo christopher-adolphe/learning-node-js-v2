@@ -1,6 +1,14 @@
 // Importing the `express` module
 const express = require('express');
 
+const path = require('path');
+/**
+ * Using the `path` module to create a custom
+ * utility function that resolves to the root
+ * directory
+*/
+const rootDir = require('./utils/path');
+
 // Importing router middleware
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
@@ -101,24 +109,31 @@ app.use(shopRoutes);
  * routes
 */
 app.use((request, response, next) => {
-  bodyContent = `
-    <h1>😵 Page not found 😵</h1>
+  // bodyContent = `
+  //   <h1>😵 Page not found 😵</h1>
 
-    <p>Sorry, the requestd path does not exit.</p>
-    <p>Click <a href="/">here</a> to go back to the home page.</p>
-  `;
+  //   <p>Sorry, the requestd path does not exit.</p>
+  //   <p>Click <a href="/">here</a> to go back to the home page.</p>
+  // `;
 
-  const htmlPage = `
-    ${pageStart}
+  // const htmlPage = `
+  //   ${pageStart}
 
-    ${bodyContent}
+  //   ${bodyContent}
     
-    ${pageEnd}
-  `;
+  //   ${pageEnd}
+  // `;
 
+  // response
+  //   .status(404)
+  //   .send(htmlPage);
+
+  // response
+  //   .status(404)
+  //   .sendFile(path.join(__dirname, 'views', 'not-found.html'));
   response
     .status(404)
-    .send(htmlPage);
+    .sendFile(path.join(rootDir, 'views', 'not-found.html'));
 });
 
 app.listen(3000);

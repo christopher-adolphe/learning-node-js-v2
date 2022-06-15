@@ -1,6 +1,14 @@
 // Importing the `express` module
 const express = require('express');
 
+const path = require('path');
+/**
+ * Using the `path` module to create a custom
+ * utility function that resolves to the root
+ * directory
+*/
+const rootDir = require('../utils/path');
+
 const { pageStart, pageEnd, products } = require('../constants');
 
 /**
@@ -20,28 +28,30 @@ const router = express.Router();
 router.get('/add-product', (request, response, next) => {
   console.log('Add Product Middleware');
 
-  bodyContent = `
-    <h1>Add Product</h1>
+  // bodyContent = `
+  //   <h1>Add Product</h1>
 
-    <form class="form" action="/admin/add-product" method="POST">
-      <div class="form__group">
-        <label for="title">Product title:</label>
-        <input type="text" id="title" name="title" />
-      </div>
+  //   <form class="form" action="/admin/add-product" method="POST">
+  //     <div class="form__group">
+  //       <label for="title">Product title:</label>
+  //       <input type="text" id="title" name="title" />
+  //     </div>
 
-      <button type="submit">Add</button>
-    </form>
-  `;
+  //     <button type="submit">Add</button>
+  //   </form>
+  // `;
 
-  const htmlPage = `
-    ${pageStart}
+  // const htmlPage = `
+  //   ${pageStart}
 
-    ${bodyContent}
+  //   ${bodyContent}
 
-    ${pageEnd}
-  `;
+  //   ${pageEnd}
+  // `;
 
-  response.send(htmlPage);
+  // response.send(htmlPage);
+  // response.sendFile(path.join(__dirname, '../', 'views', 'add-product.html'));
+  response.sendFile(path.join(rootDir, 'views', 'add-product.html'));
 });
 
 
