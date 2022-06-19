@@ -35,6 +35,15 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 
 /**
+ * Using the `static()` method to serve static files.
+ * The `static()` method is a built-in middleware
+ * function responsible to serve static file; i.e files
+ * directly accessed via the file system and not via
+ * the router middleware
+*/
+app.use(express.static(path.join(__dirname, 'public')));
+
+/**
  * Using the `use()` method to mount a middleware
  * function. A middleware function is a request handler
  * function in Express.js and we can plug multiple of
