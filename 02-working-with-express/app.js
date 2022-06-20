@@ -12,6 +12,7 @@ const rootDir = require('./utils/path');
 // Importing router middleware
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const usersRoutes = require('./routes/users');
 
 const { pageStart, pageEnd } = require('./constants');
 
@@ -78,26 +79,26 @@ app.use((request, response, next) => {
   next();
 });
 
-app.use('/users', (request, response, next) => {
-  console.log('User Middleware');
+// app.use('/users', (request, response, next) => {
+//   console.log('User Middleware');
 
-  const users = [
-    {
-      id: 156,
-      username: 'Josh'
-    },
-    {
-      id: 145,
-      username: 'Angela'
-    },
-    {
-      id: 136,
-      username: 'Peter'
-    }
-  ];
+//   const users = [
+//     {
+//       id: 156,
+//       username: 'Josh'
+//     },
+//     {
+//       id: 145,
+//       username: 'Angela'
+//     },
+//     {
+//       id: 136,
+//       username: 'Peter'
+//     }
+//   ];
 
-  response.send(JSON.stringify(users));
-});
+//   response.send(JSON.stringify(users));
+// });
 
 /**
  * Mounting the router middleware functions
@@ -112,6 +113,7 @@ app.use('/users', (request, response, next) => {
 */
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use('/users', usersRoutes);
 
 /**
  * Mounting a middleware functions as catch all

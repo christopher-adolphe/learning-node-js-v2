@@ -12,7 +12,7 @@ body {
 
 body {
   min-height: 100vh;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Commissioner', sans-serif;
 }
 
 .app {
@@ -24,8 +24,41 @@ body {
   align-items: stretch;
 }
 
-main {
+.app__header {
+  padding: 1.5rem 2rem;
+  background-color: #f94f4f;
+}
+
+.app__header ul {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app__header ul li + li {
+  margin-left: 1.5rem;
+}
+
+.app__header ul a {
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  color: #EFEFEF;
+  text-decoration: none;
+}
+
+.app__header ul a:hover,
+.app__header ul a:focus,
+.app__header ul a:active,
+.app__header ul a.active {
+  color: #191921;
+}
+
+.app__main {
   flex: 1;
+  padding: 1.5rem 2rem;
 }
 
 .form button {

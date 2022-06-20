@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Product</title>
+  <title>Users</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,24 +18,23 @@
         <ul>
           <li><a href="/">Shop</a></li>
 
-          <li><a class="active" href="/admin/add-product">Add Product</a></li>
+          <li><a href="/admin/add-product">Add Product</a></li>
 
-          <li><a href="/users">Users</a></li>
+          <li><a class="active" href="/users">Users</a></li>
         </ul>
       </nav>
     </header>
 
     <main class="app__main">
-      <h1>Add Product</h1>
+      <h1>Hello from Express.js 👋</h1>
 
-      <form action="/create-user" method="POST">
-        <div>
-          <label for="title">Product title</label>
-          <input type="text" id="title" name="title">
-        </div>
-    
-        <button type="submit">Add</button>
-      </form>
+      <h2>Users list:</h2>
+
+      <u>
+        <li>Jane</li>
+        <li>Angela</li>
+        <li>Jacob</li>
+      </u>
     </main>
   </div>
 </body>
