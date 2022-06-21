@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Product</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app__header">
+      <nav>
+        <ul>
+          <li><a href="/">Shop</a></li>
+
+          <li><a class="active" href="/admin/add-product">Add Product</a></li>
+
+          <li><a href="/users">Users</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="app__main">
+      <h1>Add Product</h1>
+
+      <form class="form" action="/create-user" method="POST">
+        <div class="form__group">
+          <label for="title">Product title</label>
+          <input type="text" id="title" name="title">
+        </div>
+    
+        <button type="submit">Add</button>
+      </form>
+    </main>
+  </div>
+</body>
+</html>
