@@ -15,6 +15,7 @@ const shopRoutes = require('./routes/shop');
 const usersRoutes = require('./routes/users');
 
 const { pageStart, pageEnd } = require('./constants');
+const { application } = require('express');
 
 /**
  * Executing `express()` as a function creates
@@ -23,6 +24,22 @@ const { pageStart, pageEnd } = require('./constants');
  * Express.js framework offers
  */
 const app = express();
+
+/**
+ * Using the `set()` method to configure the
+ * Express app server's templating engine. Here
+ * we configure `pug` as the templating engine
+ * to be used
+ */
+app.set('view engine', 'pug');
+
+/**
+ * Using the `set()` method to configure the
+ * directory from where views of the application
+ * are located. The default value for the `views`
+ * configuration is `/views`
+ */
+app.set('views', 'views');
 
 /**
  * Using the `urlencoded()` method to parse the
