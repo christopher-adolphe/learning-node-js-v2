@@ -51,7 +51,15 @@ router.get('/', (request, response, next) => {
    * the file where it was called
   */
   // response.sendFile(path.join(__dirname, '../', 'views', 'shop.html'));
-  response.sendFile(path.join(rootDir, 'views', 'shop.html'));
+  // response.sendFile(path.join(rootDir, 'views', 'shop.html'));
+
+  /**
+   * Using the `render()` method of the `response` object to
+   * terminate the request-response cycle and send a view to
+   * the client using the templating engine that has been
+   * configured using `app.set('view engine', 'pug');`
+  */
+  response.render('shop', { pageTitle: 'Shop', products });
 });
 
 module.exports = router;

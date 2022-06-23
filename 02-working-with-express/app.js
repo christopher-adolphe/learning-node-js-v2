@@ -76,25 +76,25 @@ app.use(express.static(path.join(__dirname, 'public')));
  * functions which are middleware functions that will
  * be executed when the base of the requested path matches `path`
 */
-app.use((request, response, next) => {
-  console.log('Middleware 1');
+// app.use((request, response, next) => {
+//   console.log('Middleware 1');
 
-  /**
-   * All middleware functions received a `next()` function as
-   * parameter from Express.js. If a middleware function only
-   * handles some business logic without sending a response,
-   * then it needs to execute the `next()` function to pass
-   * control to the next middleware function down the request
-   * processing pipeline
-  */
-  next();
-});
+//   /**
+//    * All middleware functions received a `next()` function as
+//    * parameter from Express.js. If a middleware function only
+//    * handles some business logic without sending a response,
+//    * then it needs to execute the `next()` function to pass
+//    * control to the next middleware function down the request
+//    * processing pipeline
+//   */
+//   next();
+// });
 
-app.use((request, response, next) => {
-  console.log('Middleware 2');
+// app.use((request, response, next) => {
+//   console.log('Middleware 2');
 
-  next();
-});
+//   next();
+// });
 
 // app.use('/users', (request, response, next) => {
 //   console.log('User Middleware');

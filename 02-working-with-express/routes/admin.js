@@ -66,7 +66,7 @@ router.post('/add-product', (request, response, next) => {
   const { title } = request.body;
 
   if (title !== '') {
-    products.push(title);
+    products.push({ title });
 
     console.log('products: ', products);
   }
