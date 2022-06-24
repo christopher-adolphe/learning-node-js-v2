@@ -57,9 +57,19 @@ router.get('/', (request, response, next) => {
    * Using the `render()` method of the `response` object to
    * terminate the request-response cycle and send a view to
    * the client using the templating engine that has been
-   * configured using `app.set('view engine', 'pug');`
+   * configured using `app.set('view engine', 'pug');`.
+   * The `render()` method takes as it's first argument the
+   * name of the view to be rendered (without the file extension)
+   * It can also take a configuration object as second optional
+   * argument where we can pass key/value pairs which then be
+   * used in the view as dynamic values
   */
-  response.render('shop', { pageTitle: 'Shop', products });
+  response.render('shop', {
+    pageTitle: 'Shop',
+    products, path: '/',
+    isCurrentPage: true,
+    hasProducts: products.length,
+  });
 });
 
 module.exports = router;

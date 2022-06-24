@@ -1,6 +1,9 @@
 // Importing the `express` module
 const express = require('express');
 
+// Importing the `express-handlebars` module
+const { create } = require('express-handlebars');
+
 const path = require('path');
 /**
  * Using the `path` module to create a custom
@@ -31,7 +34,27 @@ const app = express();
  * we configure `pug` as the templating engine
  * to be used
  */
-app.set('view engine', 'pug');
+// app.set('view engine', 'pug');
+
+/**
+ * Using the `engine()` method to register the
+ * templating engine for our views. It take a
+ * string name as first parameter and a function
+ * that initializes the engine as second parameter
+ * We then use the `set()` method to configure the
+ * Express app server to use the register template
+ * engine.
+ * NOTE: Make sure that the name under which the
+ * engine is registered is the same as that set for
+ * the `view engine` configuration. Same will be used
+ * as the file extension of our views (i.e my-view.hbs)
+ */
+const expressHbs = create({
+  layoutsDir: 'views/layouts',
+  defaultLayout: 'default'
+});
+ app.engine('hbs', expressHbs.engine);
+ app.set('view engine', 'hbs');
 
 /**
  * Using the `set()` method to configure the
@@ -161,7 +184,8 @@ app.use((request, response, next) => {
   //   .sendFile(path.join(__dirname, 'views', 'not-found.html'));
   response
     .status(404)
-    .sendFile(path.join(rootDir, 'views', 'not-found.html'));
+    // .sendFile(path.join(rootDir, 'views', 'not-found.html'));
+    .render('not-found', { pageTitle: 'Page not found' });
 });
 
 app.listen(3000);
