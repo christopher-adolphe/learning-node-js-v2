@@ -2,7 +2,7 @@
 const express = require('express');
 
 // Importing the `express-handlebars` module
-const { create } = require('express-handlebars');
+// const { create } = require('express-handlebars');
 
 const path = require('path');
 /**
@@ -49,12 +49,20 @@ const app = express();
  * the `view engine` configuration. Same will be used
  * as the file extension of our views (i.e my-view.hbs)
  */
-const expressHbs = create({
-  defaultLayout: 'default',
-  extname: 'hbs'
-});
- app.engine('hbs', expressHbs.engine);
- app.set('view engine', 'hbs');
+// const expressHbs = create({
+//   defaultLayout: 'default',
+//   extname: 'hbs'
+// });
+//  app.engine('hbs', expressHbs.engine);
+//  app.set('view engine', 'hbs');
+
+/**
+ * Using the `set()` method to configure the
+ * Express app server's templating engine. Here
+ * we configure `ejs` as the templating engine
+ * to be used
+ */
+app.set('view engine', 'ejs');
 
 /**
  * Using the `set()` method to configure the
