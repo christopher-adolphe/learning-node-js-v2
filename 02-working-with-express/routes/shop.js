@@ -66,8 +66,9 @@ router.get('/', (request, response, next) => {
   */
   response.render('shop', {
     pageTitle: 'Shop',
-    products, path: '/',
-    isCurrentPage: true,
+    products,
+    path: '/',
+    isShopPage: true,
     hasProducts: products.length,
   });
 });

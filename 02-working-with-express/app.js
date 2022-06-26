@@ -50,8 +50,8 @@ const app = express();
  * as the file extension of our views (i.e my-view.hbs)
  */
 const expressHbs = create({
-  layoutsDir: 'views/layouts',
-  defaultLayout: 'default'
+  defaultLayout: 'default',
+  extname: 'hbs'
 });
  app.engine('hbs', expressHbs.engine);
  app.set('view engine', 'hbs');
@@ -62,7 +62,7 @@ const expressHbs = create({
  * are located. The default value for the `views`
  * configuration is `/views`
  */
-app.set('views', 'views');
+app.set('views', './views');
 
 /**
  * Using the `urlencoded()` method to parse the

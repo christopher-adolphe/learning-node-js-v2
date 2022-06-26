@@ -20,15 +20,15 @@
     <header class="app__header">
       <nav>
         <ul>
-          <li><a class="{{#if isCurrentPage}}active{{/if}}" href="/">Shop</a></li>
+          <li><a class="{{#if isShopPage}}active{{/if}}" href="/">Shop</a></li>
 
-          <li><a class="{{#if isCurrentPage}}active{{/if}}" href="/admin/add-product">Add Product</a></li>
+          <li><a class="{{#if isAdminPage}}active{{/if}}" href="/admin/add-product">Add Product</a></li>
         </ul>
       </nav>
     </header>
 
     <main class="app__main">
-      {{{ content }}}
+      {{{ body }}}
     </main>
   </div>
 </body>

@@ -56,7 +56,7 @@ router.get('/add-product', (request, response, next) => {
   response.render('add-product', {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
-    isCurrentPage: true,
+    isAdminPage: true,
     hasFormCSS: true,
   });
 });
