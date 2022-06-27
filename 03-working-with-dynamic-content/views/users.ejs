@@ -2,8 +2,20 @@
 </head>
 <body>
   <div class="app">
+    <%- include('partials/_header.ejs') %>
+
     <main class="app__main">
       <h1>Users list:</h1>
+
+      <% if (hasUsers) { %>
+        <ul>
+          <% for (const user of users) { %>
+            <li><%= user %></li>
+          <% } %>
+        </ul>
+      <% } else { %>
+        <p>Sorry, no users found.</p>
+      <% } %>
     </main>
   </div>
 <%- include('partials/_end.ejs') %>

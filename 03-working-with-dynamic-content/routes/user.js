@@ -8,7 +8,8 @@ router.get('/', (request, response, next) => {
   response.render('users', {
     pageTitle: 'Users list',
     slug: 'users',
-    users
+    users,
+    hasUsers: users.length
   });
 });
 

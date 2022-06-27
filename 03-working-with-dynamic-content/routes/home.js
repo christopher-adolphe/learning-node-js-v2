@@ -17,12 +17,14 @@ router.post('/', (request, response, next) => {
   if (!username) {
     response
       .status(404)
-      .redirect('/')
+      .redirect('/');
   }
+
+  users.push(username);
 
   response
     .status(201)
     .redirect('/users');
-})
+});
 
 module.exports = router;
