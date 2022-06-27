@@ -1,6 +1,9 @@
 // Importing the `express` module
 const express = require('express');
 
+// Importing the `express-handlebars` module
+// const { create } = require('express-handlebars');
+
 const path = require('path');
 /**
  * Using the `path` module to create a custom
@@ -15,6 +18,7 @@ const shopRoutes = require('./routes/shop');
 const usersRoutes = require('./routes/users');
 
 const { pageStart, pageEnd } = require('./constants');
+const { application } = require('express');
 
 /**
  * Executing `express()` as a function creates
@@ -23,6 +27,50 @@ const { pageStart, pageEnd } = require('./constants');
  * Express.js framework offers
  */
 const app = express();
+
+/**
+ * Using the `set()` method to configure the
+ * Express app server's templating engine. Here
+ * we configure `pug` as the templating engine
+ * to be used
+ */
+// app.set('view engine', 'pug');
+
+/**
+ * Using the `engine()` method to register the
+ * templating engine for our views. It take a
+ * string name as first parameter and a function
+ * that initializes the engine as second parameter
+ * We then use the `set()` method to configure the
+ * Express app server to use the register template
+ * engine.
+ * NOTE: Make sure that the name under which the
+ * engine is registered is the same as that set for
+ * the `view engine` configuration. Same will be used
+ * as the file extension of our views (i.e my-view.hbs)
+ */
+// const expressHbs = create({
+//   defaultLayout: 'default',
+//   extname: 'hbs'
+// });
+//  app.engine('hbs', expressHbs.engine);
+//  app.set('view engine', 'hbs');
+
+/**
+ * Using the `set()` method to configure the
+ * Express app server's templating engine. Here
+ * we configure `ejs` as the templating engine
+ * to be used
+ */
+app.set('view engine', 'ejs');
+
+/**
+ * Using the `set()` method to configure the
+ * directory from where views of the application
+ * are located. The default value for the `views`
+ * configuration is `/views`
+ */
+app.set('views', './views');
 
 /**
  * Using the `urlencoded()` method to parse the
@@ -59,25 +107,25 @@ app.use(express.static(path.join(__dirname, 'public')));
  * functions which are middleware functions that will
  * be executed when the base of the requested path matches `path`
 */
-app.use((request, response, next) => {
-  console.log('Middleware 1');
+// app.use((request, response, next) => {
+//   console.log('Middleware 1');
 
-  /**
-   * All middleware functions received a `next()` function as
-   * parameter from Express.js. If a middleware function only
-   * handles some business logic without sending a response,
-   * then it needs to execute the `next()` function to pass
-   * control to the next middleware function down the request
-   * processing pipeline
-  */
-  next();
-});
+//   /**
+//    * All middleware functions received a `next()` function as
+//    * parameter from Express.js. If a middleware function only
+//    * handles some business logic without sending a response,
+//    * then it needs to execute the `next()` function to pass
+//    * control to the next middleware function down the request
+//    * processing pipeline
+//   */
+//   next();
+// });
 
-app.use((request, response, next) => {
-  console.log('Middleware 2');
+// app.use((request, response, next) => {
+//   console.log('Middleware 2');
 
-  next();
-});
+//   next();
+// });
 
 // app.use('/users', (request, response, next) => {
 //   console.log('User Middleware');
@@ -144,7 +192,8 @@ app.use((request, response, next) => {
   //   .sendFile(path.join(__dirname, 'views', 'not-found.html'));
   response
     .status(404)
-    .sendFile(path.join(rootDir, 'views', 'not-found.html'));
+    // .sendFile(path.join(rootDir, 'views', 'not-found.html'));
+    .render('not-found', { pageTitle: 'Page not found' });
 });
 
 app.listen(3000);

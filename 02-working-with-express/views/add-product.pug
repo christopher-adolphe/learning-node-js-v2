@@ -1,0 +1,14 @@
+extends layouts/default.pug
+
+block styles
+ link(rel="stylesheet", href="/css/form.css")
+
+block content
+  h1 Add Product
+
+  form.form(action="/admin/add-product", method="POST")
+    div.form__group
+      label(for="title") Product title
+      input#title(type="text", name="title")
+    
+    button(type="submit") Add

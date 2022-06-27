@@ -51,7 +51,14 @@ router.get('/add-product', (request, response, next) => {
 
   // response.send(htmlPage);
   // response.sendFile(path.join(__dirname, '../', 'views', 'add-product.html'));
-  response.sendFile(path.join(rootDir, 'views', 'add-product.html'));
+  // response.sendFile(path.join(rootDir, 'views', 'add-product.html'));
+
+  response.render('add-product', {
+    pageTitle: 'Add Product',
+    path: '/admin/add-product',
+    isAdminPage: true,
+    hasFormCSS: true,
+  });
 });
 
 
@@ -66,7 +73,7 @@ router.post('/add-product', (request, response, next) => {
   const { title } = request.body;
 
   if (title !== '') {
-    products.push(title);
+    products.push({ title });
 
     console.log('products: ', products);
   }

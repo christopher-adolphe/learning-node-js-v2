@@ -1,0 +1,21 @@
+<%- include('partials/_start.ejs') %>
+  <link rel="stylesheet" href="/css/form.css" />
+</head>
+<body>
+  <div class="app">
+    <%- include('partials/_header.ejs') %>
+
+    <main class="app__main">
+      <h1>Please fill the form.</h1>
+
+      <form class="form" action="/" method="POST">
+        <div class="form__group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username">
+        </div>
+    
+        <button type="submit">Add</button>
+      </form>
+    </main>
+  </div>
+<%- include('partials/_end.ejs') %>
