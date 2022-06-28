@@ -6,14 +6,16 @@ const path = require('path');
  * utility function that resolves to the root
  * directory
 */
-const rootDir = require('../utils/path');
+// const rootDir = require('../utils/path');
 
-const { pageStart, pageEnd, products } = require('../constants');
+// const { pageStart, pageEnd, products } = require('../constants');
+
+const { getProducts } = require('../controllers/products');
 
 const router = express.Router();
 
-router.get('/', (request, response, next) => {
-  console.log('Middleware 3');
+// router.get('/', (request, response, next) => {
+//   console.log('Middleware 3');
   // bodyContent = `
   //   <h1>Hello from Express.js 👋</h1>
 
@@ -64,13 +66,14 @@ router.get('/', (request, response, next) => {
    * argument where we can pass key/value pairs which then be
    * used in the view as dynamic values
   */
-  response.render('shop', {
-    pageTitle: 'Shop',
-    products,
-    path: '/',
-    isShopPage: true,
-    hasProducts: products.length,
-  });
-});
+//   response.render('shop', {
+//     pageTitle: 'Shop',
+//     products,
+//     path: '/',
+//     isShopPage: true,
+//     hasProducts: products.length,
+//   });
+// });
+router.get('/', getProducts);
 
 module.exports = router;

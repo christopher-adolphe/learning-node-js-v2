@@ -7,9 +7,11 @@ const path = require('path');
  * utility function that resolves to the root
  * directory
 */
-const rootDir = require('../utils/path');
+// const rootDir = require('../utils/path');
 
-const { pageStart, pageEnd, products } = require('../constants');
+// const { pageStart, pageEnd, products } = require('../constants');
+
+const { getAddProduct, postAddProduct } = require('../controllers/products');
 
 /**
  * Using the `Router()` method to create a
@@ -25,8 +27,8 @@ const router = express.Router();
  * The `Express` app would match this route as:
  * /admin/add-product for HTTP GET requests only
 */
-router.get('/add-product', (request, response, next) => {
-  console.log('Add Product Middleware');
+// router.get('/add-product', (request, response, next) => {
+//   console.log('Add Product Middleware');
 
   // bodyContent = `
   //   <h1>Add Product</h1>
@@ -53,13 +55,22 @@ router.get('/add-product', (request, response, next) => {
   // response.sendFile(path.join(__dirname, '../', 'views', 'add-product.html'));
   // response.sendFile(path.join(rootDir, 'views', 'add-product.html'));
 
-  response.render('add-product', {
-    pageTitle: 'Add Product',
-    path: '/admin/add-product',
-    isAdminPage: true,
-    hasFormCSS: true,
-  });
-});
+//   response.render('add-product', {
+//     pageTitle: 'Add Product',
+//     path: '/admin/add-product',
+//     isAdminPage: true,
+//     hasFormCSS: true,
+//   });
+// });
+
+/**
+ * The `Express` app would match this route as:
+ * /admin/add-product for HTTP GET requests only
+ * This route is receiving the `getAddProduct()`
+ * controller which is a middle function responsible
+ * for handle the logic when this route match
+*/
+router.get('/add-product', getAddProduct);
 
 
 /**
@@ -68,22 +79,23 @@ router.get('/add-product', (request, response, next) => {
  * The `Express` app would match this route as:
  * /admin/add-product for HTTP POST requests only
 */
-router.post('/add-product', (request, response, next) => {
-  console.log('request body: ', request.body);
-  const { title } = request.body;
+// router.post('/add-product', (request, response, next) => {
+//   console.log('request body: ', request.body);
+//   const { title } = request.body;
 
-  if (title !== '') {
-    products.push({ title });
+//   if (title !== '') {
+//     products.push({ title });
 
-    console.log('products: ', products);
-  }
+//     console.log('products: ', products);
+//   }
   /**
    * Using the `redirect()` method of the `response` object to
    * terminate the request-response cycle and redirect the client
    * to different url
   */
-  response.redirect('/');
-});
+  // response.redirect('/');
+// });
+router.post('/add-product', postAddProduct);
 
 /**
  * Exporting the `router` object to make it
