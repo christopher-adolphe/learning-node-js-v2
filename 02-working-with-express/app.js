@@ -20,6 +20,8 @@ const usersRoutes = require('./routes/users');
 const { pageStart, pageEnd } = require('./constants');
 const { application } = require('express');
 
+const get404 = require('./controllers/error');
+
 /**
  * Executing `express()` as a function creates
  * a new instance of an `express` app which then
@@ -167,7 +169,8 @@ app.use('/users', usersRoutes);
  * Mounting a middleware functions as catch all
  * routes
 */
-app.use((request, response, next) => {
+app.use(get404);
+// app.use((request, response, next) => {
   // bodyContent = `
   //   <h1>😵 Page not found 😵</h1>
 
@@ -190,10 +193,10 @@ app.use((request, response, next) => {
   // response
   //   .status(404)
   //   .sendFile(path.join(__dirname, 'views', 'not-found.html'));
-  response
-    .status(404)
-    // .sendFile(path.join(rootDir, 'views', 'not-found.html'));
-    .render('not-found', { pageTitle: 'Page not found' });
-});
+//   response
+//     .status(404)
+//     // .sendFile(path.join(rootDir, 'views', 'not-found.html'));
+//     .render('not-found', { pageTitle: 'Page not found' });
+// });
 
 app.listen(3000);
