@@ -24,15 +24,15 @@ const postAddProduct = (request, response, next) => {
   response.redirect('/');
 };
 
-const getProducts = (request, response, next) => {
-  const products = Product.fetchAll();
-  
-  response.render('shop', {
-    pageTitle: 'Shop',
-    products,
-    path: '/',
-    isShopPage: true,
-    hasProducts: products.length,
+const getProducts = async (request, response, next) => {
+  Product.fetchAll((products) => {
+    response.render('shop', {
+      pageTitle: 'Shop',
+      products,
+      path: '/',
+      isShopPage: true,
+      hasProducts: products.length,
+    });
   });
 };
 
