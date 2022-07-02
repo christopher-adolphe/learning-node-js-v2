@@ -8,14 +8,14 @@ const getShop = (request, response) => {
 const getProductList = (request, response) => {
   response.render('shop/product-list', {
     pageTitle: 'Product List',
-    slug: 'product-list',
+    slug: 'products',
   });
 };
 
 const getProductDetails = (request, response) => {
   response.render('shop/product-details', {
     pageTitle: 'Product Details',
-    slug: 'product-details',
+    slug: 'products',
   });
 };
 

@@ -7,9 +7,21 @@ const getProducts = (request, response) => {
 
 const getProduct = (request, response) => {
   // NOT IMPLEMENTED
+  response.render('admin/view-product', {
+    pageTitle: 'Product details',
+    slug: 'view-products',
+  });
 };
 
-const editProduct = (request, response) => {
+const addProduct = (request, response) => {
+  // NOT IMPLEMENTED
+  response.render('admin/add-product', {
+    pageTitle: 'Add Product',
+    slug: 'add-product',
+  });
+};
+
+const createProduct = (request, response) => {
   // NOT IMPLEMENTED
 };
 
@@ -24,7 +36,8 @@ const deleteProduct = (request, response) => {
 module.exports = {
   getProducts,
   getProduct,
-  editProduct,
+  addProduct,
+  createProduct,
   updateProduct,
   deleteProduct,
 };
