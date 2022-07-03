@@ -1,11 +1,38 @@
 <%- include('../partials/_start.ejs') %>
+  <link rel="stylesheet" href="/css/form.css" />
 </head>
 <body>
   <div class="app">
     <%- include('../partials/_header.ejs') %>
 
     <main class="app__main">
-      <h1>Admin add product page</h1>
+      <div class="container">
+        <h1>Admin add product page</h1>
+        
+        <form class="form" action="/admin/add-product" method="POST">
+          <div class="form__group">
+            <label for="title">Product title</label>
+            <input type="text" id="title" name="title" />
+          </div>
+  
+          <div class="form__group">
+            <label for="imgUrl">Product image</label>
+            <input type="text" id="imgUrl" name="imgUrl" />
+          </div>
+  
+          <div class="form__group">
+            <label for="price">Product price</label>
+            <input type="number" id="price" name="price" step="0.01" />
+          </div>
+
+          <div class="form__group">
+            <label for="description">Product description</label>
+            <textarea id="description" name="description" rows="5"></textarea>
+          </div>
+      
+          <button type="submit">Add</button>
+        </form>
+      </div>
     </main>
   </div>
 <%- include('../partials/_end.ejs') %>

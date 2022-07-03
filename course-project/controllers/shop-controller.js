@@ -1,15 +1,27 @@
+const Product = require('../models/product');
+
 const getShop = (request, response) => {
-  response.render('shop/index', {
-    pageTitle: 'Welcome',
-    slug: 'shop',
-  })
+  const getAllProducts = (products) => {
+    response.render('shop/index', {
+      pageTitle: 'Welcome',
+      slug: 'shop',
+    });
+  };
+
+  Product.fetchAll(getAllProducts);
 };
 
 const getProductList = (request, response) => {
-  response.render('shop/product-list', {
-    pageTitle: 'Product List',
-    slug: 'products',
-  });
+  const getAllProducts = (products) => {
+    response.render('shop/product-list', {
+      pageTitle: 'Product List',
+      slug: 'products',
+      hasProducts: products.length,
+      products,
+    });
+  };
+
+  Product.fetchAll(getAllProducts);
 };
 
 const getProductDetails = (request, response) => {

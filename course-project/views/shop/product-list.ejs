@@ -5,7 +5,33 @@
     <%- include('../partials/_header.ejs') %>
 
     <main class="app__main">
-      <h1>Shop product list page</h1>
+      <div class="container">
+        <h1>Products</h1>
+
+        <% if (hasProducts) { %>
+          <div class="grid">
+            <% products.forEach(product => { %>
+              <article class="card product-item">
+                <header class="card__header">
+                  <h1 class="product__title"><%= product.title %></h1>
+                  <div class="card__image">
+                    <img src="<%= product.imgUrl %>" alt="<%= product.title %>" />
+                  </div>
+                  <div class="card__content">
+                    <h2 class="product__price"><%= product.price %></h2>
+                    <p class="product__description"><%= product.description %></p>
+                  </div>
+                  <div class="card__actions">
+                    <button class="btn">Add to Cart</button>
+                  </div>
+                </header>
+              </article>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <p>Sorry, there are no products.</p>
+        <% } %>
+      </div>
     </main>
   </div>
 <%- include('../partials/_end.ejs') %>

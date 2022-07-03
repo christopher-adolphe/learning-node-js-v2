@@ -24,6 +24,13 @@ body {
   align-items: stretch;
 }
 
+.container {
+  width: 100%;
+  max-width: 69.375rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
 .app__header {
   padding: 1.5rem 2rem;
   background-color: #f94f4f;

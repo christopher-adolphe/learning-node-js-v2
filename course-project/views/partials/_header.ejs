@@ -1,25 +1,27 @@
 <header class="app__header">
-  <nav>
-    <ul>
-      <li>
-        <a href="/" class="<%= slug === 'shop' ? 'active' : '' %>">Shop</a>
-      </li>
-
-      <li>
-        <a href="/products" class="<%= slug === 'products' ? 'active' : '' %>">Products</a>
-      </li>
-
-      <li>
-        <a href="/cart" class="<%= slug === 'cart' ? 'active' : '' %>">Cart</a>
-      </li>
-
-      <li>
-        <a href="/admin/add-product/" class="<%= slug === 'add-product' ? 'active' : '' %>">Add Product</a>
-      </li>
-
-      <li>
-        <a href="/admin/products" class="<%= slug === 'view-products' ? 'active' : '' %>">Admin Products</a>
-      </li>
-    </ul>
-  </nav>
+  <div class="container">
+    <nav>
+      <ul>
+        <li>
+          <a href="/" class="<%= slug === 'shop' ? 'active' : '' %>">Shop</a>
+        </li>
+  
+        <li>
+          <a href="/products" class="<%= slug === 'products' ? 'active' : '' %>">Products</a>
+        </li>
+  
+        <li>
+          <a href="/cart" class="<%= slug === 'cart' ? 'active' : '' %>">Cart</a>
+        </li>
+  
+        <li>
+          <a href="/admin/add-product/" class="<%= slug === 'add-product' ? 'active' : '' %>">Add Product</a>
+        </li>
+  
+        <li>
+          <a href="/admin/products" class="<%= slug === 'view-products' ? 'active' : '' %>">Admin Products</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
 </header>

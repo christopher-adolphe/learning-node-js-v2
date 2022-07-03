@@ -1,3 +1,5 @@
+const Product = require('../models/product');
+
 const getProducts = (request, response) => {
   response.render('admin/view-products', {
     pageTitle: 'View Products',
@@ -14,7 +16,6 @@ const getProduct = (request, response) => {
 };
 
 const addProduct = (request, response) => {
-  // NOT IMPLEMENTED
   response.render('admin/add-product', {
     pageTitle: 'Add Product',
     slug: 'add-product',
@@ -22,7 +23,15 @@ const addProduct = (request, response) => {
 };
 
 const createProduct = (request, response) => {
-  // NOT IMPLEMENTED
+  const { title, imgUrl, description, price } = request.body;
+
+  if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
+    const product = new Product(title, imgUrl, description, price);
+
+    product.save();
+  }
+
+  response.redirect('/');
 };
 
 const updateProduct = (request, response) => {

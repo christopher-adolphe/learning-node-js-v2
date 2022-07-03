@@ -11,7 +11,7 @@ const getProductsFromFile = (productsCb) => {
    * Since the `readFile()` method of Node.js's
    * file system module is asynchronous, returning
    * the array of products from inside it would
-   * not work. That why we pass a callback function
+   * not work. That's why we pass a callback function
    * to the `fetchAll()` method which we can call
    * inside `readFile)()` to get the products
   */
