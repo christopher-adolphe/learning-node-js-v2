@@ -1,10 +1,16 @@
 const Product = require('../models/product');
 
 const getProducts = (request, response) => {
-  response.render('admin/view-products', {
-    pageTitle: 'View Products',
-    slug: 'view-products',
-  });
+  const getAllProducts = (products) => {
+    response.render('admin/view-products', {
+      pageTitle: 'View Products',
+      slug: 'view-products',
+      hasProducts: products.length,
+      products,
+    });
+  };
+
+  Product.fetchAll(getAllProducts);
 };
 
 const getProduct = (request, response) => {
