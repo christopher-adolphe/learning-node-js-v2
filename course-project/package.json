@@ -1,0 +1,23 @@
+{
+  "name": "express-online-shop",
+  "version": "1.0.0",
+  "description": "Online shop with Node.js and Express",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Node.js",
+    "Express"
+  ],
+  "author": "Christopher Adolphe",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.8",
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.18"
+  }
+}

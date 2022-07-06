@@ -1,0 +1,40 @@
+<%- include('../partials/_start.ejs') %>
+</head>
+<body>
+  <div class="app">
+    <%- include('../partials/_header.ejs') %>
+
+    <main class="app__main">
+      <div class="container">
+        <h1>Admin Products</h1>
+
+        <% if (hasProducts) { %>
+          <div class="grid">
+            <% products.forEach(product => { %>
+              <article class="card product-item">
+                <header class="card__header">
+                  <h1 class="product__title"><%= product.title %></h1>
+                  <div class="card__image">
+                    <img src="<%= product.imgUrl %>" alt="<%= product.title %>" />
+                  </div>
+                  <div class="card__content">
+                    <h2 class="product__price"><%= product.price %></h2>
+                    <p class="product__description"><%= product.description %></p>
+                  </div>
+                  <div class="card__actions">
+                    <a href="/admin/view-product/1" class="btn btn-edit">Edit</a>
+                    <form action="/admin/products/1" method="DELETE">
+                      <button class="btn btn-delete">Delete</button>
+                    </form>
+                  </div>
+                </header>
+              </article>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <p>Sorry, there are no products.</p>
+        <% } %>
+      </div>
+    </main>
+  </div>
+<%- include('../partials/_end.ejs') %>

@@ -1,0 +1,141 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  font-family: 'Commissioner', sans-serif;
+}
+
+.app {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.container {
+  width: 100%;
+  max-width: 69.375rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.app__header {
+  padding: 1.5rem 2rem;
+  background-color: #f94f4f;
+}
+
+.app__header ul {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app__header ul li + li {
+  margin-left: 1.5rem;
+}
+
+.app__header ul a {
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  color: #EFEFEF;
+  text-decoration: none;
+}
+
+.app__header ul a:hover,
+.app__header ul a:focus,
+.app__header ul a:active,
+.app__header ul a.active {
+  color: #191921;
+}
+
+.app__main {
+  flex: 1;
+  padding: 1.5rem 2rem;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  /* grid-gap: 2.5rem; */
+}
+
+.card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+}
+
+.card__header,
+.card__content {
+  padding: 1rem;
+}
+
+.card__header h1,
+.card__content h1,
+.card__content h2,
+.card__content p {
+  margin: 0;
+}
+
+.card__image {
+  width: 100%;
+}
+
+.card__image img {
+  width: 100%;
+}
+
+.card__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  /* text-align: center; */
+}
+
+.card__actions button,
+.card__actions a {
+    margin: 0 0.25rem;
+}
+
+.product-item {
+  flex-basis: calc(33.333% - 2.5rem);
+  margin: 1.25rem;
+}
+
+.btn {
+  padding: 0.75rem 1.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #EFEFEF;
+  background-color: #191921;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn.btn-edit {
+  color: #EFEFEF;
+  background-color: #3498db;
+}
+
+.btn.btn-delete {
+  color: #EFEFEF;
+  background-color: #e74c3c;
+}
