@@ -101,8 +101,11 @@ body {
 }
 
 .card__actions {
-    padding: 1rem;
-    text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  /* text-align: center; */
 }
 
 .card__actions button,

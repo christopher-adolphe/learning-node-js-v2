@@ -38,6 +38,13 @@ const getCart = (request, response) => {
   });
 };
 
+const getOrders = (request, response) => {
+  response.render('shop/orders', {
+    pageTitle: 'My Orders',
+    slug: 'orders',
+  });
+};
+
 const getCheckout = (request, response) => {
   response.render('shop/checkout', {
     pageTitle: 'Checkout',
@@ -50,5 +57,6 @@ module.exports = {
   getProductList,
   getProductDetails,
   getCart,
+  getOrders,
   getCheckout
 };
