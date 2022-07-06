@@ -23,6 +23,7 @@ class Product {
   }
 
   save() {
+    this.id = Math.random().toString();
     const saveProductCallback = (products) => {
       products.push(this);
 
