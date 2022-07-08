@@ -25,10 +25,16 @@ const getProductList = (request, response) => {
 };
 
 const getProductDetails = (request, response) => {
-  response.render('shop/product-details', {
-    pageTitle: 'Product Details',
-    slug: 'products',
-  });
+  const productId = request.params.id;
+  const getProduct = (product) => {
+    response.render('shop/product-details', {
+      pageTitle: 'Product Details',
+      slug: 'products',
+      product,
+    });
+  };
+
+  Product.findById(productId, getProduct);
 };
 
 const getCart = (request, response) => {

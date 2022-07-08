@@ -40,6 +40,16 @@ class Product {
   static fetchAll(getAllProductsCallback) {
     getDataFromFile(getAllProductsCallback);
   }
+
+  static findById(id, getProductByIdCallback) {
+    const getAllProductsCallback = (products) => {
+      const product = products.find(product => product.id === id);
+
+      getProductByIdCallback(product);
+    };
+
+    getDataFromFile(getAllProductsCallback);
+  }
 }
 
 module.exports = Product;

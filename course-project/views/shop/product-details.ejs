@@ -6,7 +6,32 @@
 
     <main class="app__main">
       <div class="container">
-        <h1>Shop product details page</h1>
+        <% if (product) { %>
+          <h1><%= product.title %></h1>
+          
+          <div class="grid">
+              <article class="card product-item">
+                <header class="card__header">
+                  <h1 class="product__title"><%= product.title %></h1>
+                  <div class="card__image">
+                    <img src="<%= product.imgUrl %>" alt="<%= product.title %>" />
+                  </div>
+                  <div class="card__content">
+                    <h2 class="product__price"><%= product.price %></h2>
+                    <p class="product__description"><%= product.description %></p>
+                  </div>
+                  <div class="card__actions">
+                    <form action="/cart/<%= product.id %>" method="POST">
+                      <button class="btn btn-edit">Add to Cart</button>
+                    </form>
+                  </div>
+                </header>
+              </article>
+          </div>
+        <% } else { %>
+          <h1>No product</h1>
+          <p>Sorry, this product has either been removed or does not exist.</p>
+        <% } %>
       </div>
     </main>
   </div>
