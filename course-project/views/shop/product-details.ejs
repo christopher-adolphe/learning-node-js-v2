@@ -8,25 +8,16 @@
       <div class="container">
         <% if (product) { %>
           <h1><%= product.title %></h1>
-          
-          <div class="grid">
-              <article class="card product-item">
-                <header class="card__header">
-                  <h1 class="product__title"><%= product.title %></h1>
-                  <div class="card__image">
-                    <img src="<%= product.imgUrl %>" alt="<%= product.title %>" />
-                  </div>
-                  <div class="card__content">
-                    <h2 class="product__price"><%= product.price %></h2>
-                    <p class="product__description"><%= product.description %></p>
-                  </div>
-                  <div class="card__actions">
-                    <form action="/cart/<%= product.id %>" method="POST">
-                      <button class="btn btn-edit">Add to Cart</button>
-                    </form>
-                  </div>
-                </header>
-              </article>
+
+          <div class="product">
+            <div class="product__img">
+              <img src="<%= product.imgUrl %>" alt="<%= product.title %>" />
+            </div>
+            <div class="product__description">
+              <p class="product__description"><%= product.description %></p>
+              <h2 class="product__price"><%= product.price %></h2>
+              <%- include('../partials/_add-to-cart-form.ejs') %>
+            </div>
           </div>
         <% } else { %>
           <h1>No product</h1>
