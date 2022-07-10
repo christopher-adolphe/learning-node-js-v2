@@ -6,6 +6,7 @@ const {
   getProduct,
   addProduct,
   createProduct,
+  editProduct,
   updateProduct,
   deleteProduct,
 } = require('../controllers/admin-controller');
@@ -17,6 +18,8 @@ router.get('/products/:id', getProduct);
 router.get('/add-product', addProduct);
 
 router.post('/add-product', createProduct);
+
+router.get('/edit-product', editProduct);
 
 router.put('/products/:id', updateProduct);
 

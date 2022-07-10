@@ -22,7 +22,7 @@ const getProduct = (request, response) => {
 };
 
 const addProduct = (request, response) => {
-  response.render('admin/add-product', {
+  response.render('admin/edit-product', {
     pageTitle: 'Add Product',
     slug: 'add-product',
   });
@@ -40,6 +40,20 @@ const createProduct = (request, response) => {
   response.redirect('/');
 };
 
+const editProduct = (request, response) => {
+  const isEditMode =  request.query.edit;
+
+  if (!isEditMode) {
+    return response.redirect('/');
+  }
+
+  response.render('admin/edit-product', {
+    pageTitle: 'Edit Product',
+    slug: 'edit-product',
+    isEditMode: !!isEditMode
+  });
+};
+
 const updateProduct = (request, response) => {
   // NOT IMPLEMENTED
 };
@@ -53,6 +67,7 @@ module.exports = {
   getProduct,
   addProduct,
   createProduct,
+  editProduct,
   updateProduct,
   deleteProduct,
 };
