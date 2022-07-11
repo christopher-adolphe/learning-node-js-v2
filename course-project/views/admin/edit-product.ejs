@@ -1,4 +1,5 @@
 <%- include('../partials/_start.ejs') %>
+  <link rel="stylesheet" href="/css/form.css" />
 </head>
 <body>
   <div class="app">
@@ -8,28 +9,28 @@
       <div class="container">
         <h1>Admin edit product page</h1>
 
-        <form class="form" action="/admin/add-product" method="POST">
+        <form class="form" action="<% if (isEditMode) { %>/admin/edit-product<% } else { %>/admin/add-product<% } %>" method="POST">
           <div class="form__group">
             <label for="title">Product title</label>
-            <input type="text" id="title" name="title" />
+            <input type="text" id="title" name="title" value="<% if (isEditMode) { %><%= product.title %><% } %>" />
           </div>
   
           <div class="form__group">
             <label for="imgUrl">Product image</label>
-            <input type="text" id="imgUrl" name="imgUrl" />
+            <input type="text" id="imgUrl" name="imgUrl" value="<% if (isEditMode) { %><%= product.imgUrl %><% } %>" />
           </div>
   
           <div class="form__group">
             <label for="price">Product price</label>
-            <input type="number" id="price" name="price" step="0.01" />
+            <input type="number" id="price" name="price" step="0.01" value="<% if (isEditMode) { %><%= product.price %><% } %>" />
           </div>
 
           <div class="form__group">
             <label for="description">Product description</label>
-            <textarea id="description" name="description" rows="5"></textarea>
+            <textarea id="description" name="description" rows="5"><% if (isEditMode) { %><%= product.description %><% } %></textarea>
           </div>
       
-          <button type="submit">Add</button>
+          <button type="submit"><% if (isEditMode) { %>Update<% } else { %>Add<% } %></button>
         </form>
       </div>
     </main>

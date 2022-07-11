@@ -25,6 +25,7 @@ const addProduct = (request, response) => {
   response.render('admin/edit-product', {
     pageTitle: 'Add Product',
     slug: 'add-product',
+    isEditMode: false
   });
 };
 
@@ -32,7 +33,7 @@ const createProduct = (request, response) => {
   const { title, imgUrl, description, price } = request.body;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
-    const product = new Product(title, imgUrl, description, price);
+    const product = new Product(null, title, imgUrl, description, price);
 
     product.save();
   }
@@ -42,15 +43,23 @@ const createProduct = (request, response) => {
 
 const editProduct = (request, response) => {
   const isEditMode =  request.query.edit;
+  const productId = request.params.id;
 
   if (!isEditMode) {
-    return response.redirect('/');
+    return response.redirect('/admin/products');
   }
 
-  response.render('admin/edit-product', {
-    pageTitle: 'Edit Product',
-    slug: 'edit-product',
-    isEditMode: !!isEditMode
+  Product.findById(productId, (product) => {
+    if (!product) {
+      return response.redirect('/');
+    }
+
+    response.render('admin/edit-product', {
+      pageTitle: 'Edit Product',
+      slug: 'edit-product',
+      isEditMode: !!isEditMode,
+      product
+    });
   });
 };
 
