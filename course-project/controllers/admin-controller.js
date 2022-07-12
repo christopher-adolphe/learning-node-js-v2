@@ -64,11 +64,23 @@ const editProduct = (request, response) => {
 };
 
 const updateProduct = (request, response) => {
-  // NOT IMPLEMENTED
+  const { productId, title, imgUrl, description, price } = request.body;
+
+  if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
+    const updatedProduct = new Product(productId, title, imgUrl, description, price);
+
+    updatedProduct.save();
+  }
+
+  response.redirect('/admin/products');
 };
 
 const deleteProduct = (request, response) => {
-  // NOT IMPLEMENTED
+  const { productId } = request.body;
+
+  Product.delete(productId);
+
+  response.redirect('/admin/products');
 };
 
 module.exports = {

@@ -65,6 +65,18 @@ class Product {
 
     getDataFromFile(getAllProductsCallback);
   }
+
+  static delete(id) {
+    getDataFromFile((products) => {
+      const updatedProducts = products.filter(product => product.id !== id);
+
+      const updatedData = JSON.stringify(updatedProducts);
+
+      fs.writeFile(dataPath, updatedData, (error) => {
+        console.log('Error deleting products data file: ', error);
+      });
+    });
+  }
 }
 
 module.exports = Product;
