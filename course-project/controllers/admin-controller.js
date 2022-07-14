@@ -78,7 +78,7 @@ const updateProduct = (request, response) => {
 const deleteProduct = (request, response) => {
   const { productId } = request.body;
 
-  Product.delete(productId);
+  Product.deleteById(productId);
 
   response.redirect('/admin/products');
 };

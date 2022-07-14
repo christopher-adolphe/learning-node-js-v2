@@ -37,6 +37,23 @@ class Cart {
       });
     });
   }
+
+  static deleteItem(id, price) {
+    fs.readFile(dataPath, (error, fileContent) => {
+      const cart = JSON.parse(fileContent);
+      const updatedCart = { ...cart };
+      const deletedItem = updatedCart.items.find(item => item.id === id);
+
+      updatedCart.items = updatedCart.items.filter(item => item.id !== id);
+      updatedCart.totalPrice = updatedCart.totalPrice - (+price * deletedItem.quantity);
+
+      const updatedCartData = JSON.stringify(updatedCart);
+
+      fs.writeFile(dataPath, updatedCartData, (error) => {
+        console.log('Error writing to cart.json file: ', error);
+      });
+    });
+  }
 }
 
 module.exports = Cart;

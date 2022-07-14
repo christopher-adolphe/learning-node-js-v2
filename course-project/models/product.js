@@ -4,6 +4,8 @@ const path = require('path');
 const rootDir = path.dirname(require.main.filename);
 const dataPath = path.join(rootDir, 'data', 'products.json');
 
+const Cart = require('./cart');
+
 const getDataFromFile = (retrieveDataCallback) => {
   fs.readFile(dataPath, (error, fileContent) => {
     if (error) {
@@ -66,14 +68,19 @@ class Product {
     getDataFromFile(getAllProductsCallback);
   }
 
-  static delete(id) {
+  static deleteById(id) {
     getDataFromFile((products) => {
+      const product = products.find(product => product.id === id);
       const updatedProducts = products.filter(product => product.id !== id);
 
       const updatedData = JSON.stringify(updatedProducts);
 
       fs.writeFile(dataPath, updatedData, (error) => {
-        console.log('Error deleting products data file: ', error);
+        if (!error) {
+          Cart.deleteItem(id, product.price);
+        } else {
+          console.log('Error deleting products data file: ', error);
+        }
       });
     });
   }
