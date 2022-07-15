@@ -28,7 +28,7 @@ class Cart {
         cart.items = [ ...cart.items, newProduct ];
       }
 
-      cart.totalPrice = cart.totalPrice + +price;
+      cart.totalPrice = (cart.totalPrice + +price).toFixed(2);
 
       const cartData = JSON.stringify(cart);
 
@@ -44,14 +44,31 @@ class Cart {
       const updatedCart = { ...cart };
       const deletedItem = updatedCart.items.find(item => item.id === id);
 
+      if (!deletedItem) {
+        console.log('Deleted item not found in cart.');
+        return;
+      }
+
       updatedCart.items = updatedCart.items.filter(item => item.id !== id);
-      updatedCart.totalPrice = updatedCart.totalPrice - (+price * deletedItem.quantity);
+      updatedCart.totalPrice = (updatedCart.totalPrice - (+price * deletedItem.quantity)).toFixed(2);
 
       const updatedCartData = JSON.stringify(updatedCart);
 
       fs.writeFile(dataPath, updatedCartData, (error) => {
         console.log('Error writing to cart.json file: ', error);
       });
+    });
+  }
+
+  static getCart(getCartData) {
+    fs.readFile(dataPath, (error, fileContent) => {
+      if (error) {
+        getCartData(null);
+      } else {
+        const cart = JSON.parse(fileContent);
+
+        getCartData(cart);
+      }
     });
   }
 }

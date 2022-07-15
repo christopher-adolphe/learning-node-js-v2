@@ -23,6 +23,6 @@ router.get('/edit-product/:id', editProduct);
 
 router.post('/edit-product/', updateProduct);
 
-router.delete('/products', deleteProduct);
+router.post('/delete-product', deleteProduct);
 
 module.exports = router;
