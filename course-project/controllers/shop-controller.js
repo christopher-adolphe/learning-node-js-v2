@@ -73,6 +73,17 @@ const postCart = (request, response) => {
   response.redirect('/cart');
 };
 
+const deleteCartItem = (request, response) => {
+  const { productId } = request.body;
+  console.log('Deleting cart item...', productId);
+
+  Product.findById(productId, (product) => {
+    Cart.deleteItem(productId, product.price);
+    
+    response.redirect('/cart');
+  });
+};
+
 const getOrders = (request, response) => {
   response.render('shop/orders', {
     pageTitle: 'My Orders',
@@ -94,5 +105,6 @@ module.exports = {
   getCart,
   postCart,
   getOrders,
-  getCheckout
+  getCheckout,
+  deleteCartItem
 };

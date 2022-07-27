@@ -28,7 +28,7 @@ class Cart {
         cart.items = [ ...cart.items, newProduct ];
       }
 
-      cart.totalPrice = (cart.totalPrice + +price).toFixed(2);
+      cart.totalPrice = (+cart.totalPrice + +price).toFixed(2);
 
       const cartData = JSON.stringify(cart);
 
@@ -51,6 +51,10 @@ class Cart {
 
       updatedCart.items = updatedCart.items.filter(item => item.id !== id);
       updatedCart.totalPrice = (updatedCart.totalPrice - (+price * deletedItem.quantity)).toFixed(2);
+
+      if (updatedCart.totalPrice < 0) {
+        updatedCart.totalPrice = 0.00;
+      }
 
       const updatedCartData = JSON.stringify(updatedCart);
 
