@@ -6,7 +6,24 @@
 
     <main class="app__main">
       <div class="container">
-        <h1>Shop cart page</h1>
+        <h1>Shopping cart</h1>
+
+        <% if (cartItems.length) { %>
+          <ul>
+            <% cartItems.forEach(cartItem => { %>
+              <li>
+                <p><%= cartItem.product.title %> (<%= cartItem.quantity %>)</p>
+
+                <form action="/cart-delete-item" method="POST">
+                  <input type="hidden" name="productId" value="<%= cartItem.product.id %>" />
+                  <button type="submit" class="btn btn-edit">Remove</button>
+                </form>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p>Sorry, your cart is currently empty.</p>
+        <% } %>
       </div>
     </main>
   </div>

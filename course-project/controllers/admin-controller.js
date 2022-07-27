@@ -22,9 +22,10 @@ const getProduct = (request, response) => {
 };
 
 const addProduct = (request, response) => {
-  response.render('admin/add-product', {
+  response.render('admin/edit-product', {
     pageTitle: 'Add Product',
     slug: 'add-product',
+    isEditMode: false
   });
 };
 
@@ -32,7 +33,7 @@ const createProduct = (request, response) => {
   const { title, imgUrl, description, price } = request.body;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
-    const product = new Product(title, imgUrl, description, price);
+    const product = new Product(null, title, imgUrl, description, price);
 
     product.save();
   }
@@ -40,12 +41,46 @@ const createProduct = (request, response) => {
   response.redirect('/');
 };
 
+const editProduct = (request, response) => {
+  const isEditMode =  request.query.edit;
+  const productId = request.params.id;
+
+  if (!isEditMode) {
+    return response.redirect('/admin/products');
+  }
+
+  Product.findById(productId, (product) => {
+    if (!product) {
+      return response.redirect('/');
+    }
+
+    response.render('admin/edit-product', {
+      pageTitle: 'Edit Product',
+      slug: 'edit-product',
+      isEditMode: !!isEditMode,
+      product
+    });
+  });
+};
+
 const updateProduct = (request, response) => {
-  // NOT IMPLEMENTED
+  const { productId, title, imgUrl, description, price } = request.body;
+
+  if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
+    const updatedProduct = new Product(productId, title, imgUrl, description, price);
+
+    updatedProduct.save();
+  }
+
+  response.redirect('/admin/products');
 };
 
 const deleteProduct = (request, response) => {
-  // NOT IMPLEMENTED
+  const { productId } = request.body;
+
+  Product.deleteById(productId);
+
+  response.redirect('/admin/products');
 };
 
 module.exports = {
@@ -53,6 +88,7 @@ module.exports = {
   getProduct,
   addProduct,
   createProduct,
+  editProduct,
   updateProduct,
   deleteProduct,
 };

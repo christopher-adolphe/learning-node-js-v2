@@ -6,7 +6,23 @@
 
     <main class="app__main">
       <div class="container">
-        <h1>Shop product details page</h1>
+        <% if (product) { %>
+          <h1><%= product.title %></h1>
+
+          <div class="product">
+            <div class="product__img">
+              <img src="<%= product.imgUrl %>" alt="<%= product.title %>" />
+            </div>
+            <div class="product__description">
+              <p class="product__description"><%= product.description %></p>
+              <h2 class="product__price"><%= product.price %></h2>
+              <%- include('../partials/_add-to-cart-form.ejs') %>
+            </div>
+          </div>
+        <% } else { %>
+          <h1>No product</h1>
+          <p>Sorry, this product has either been removed or does not exist.</p>
+        <% } %>
       </div>
     </main>
   </div>
