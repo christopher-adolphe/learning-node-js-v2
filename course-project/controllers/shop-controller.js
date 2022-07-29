@@ -2,40 +2,92 @@ const Product = require('../models/product');
 const Cart = require('../models/cart');
 
 const getShop = (request, response) => {
-  const getAllProducts = (products) => {
-    response.render('shop/index', {
-      pageTitle: 'Welcome',
-      slug: 'shop',
-    });
-  };
+  // const getAllProducts = (products) => {
+  //   response.render('shop/index', {
+  //     pageTitle: 'Welcome',
+  //     slug: 'shop',
+  //   });
+  // };
 
-  Product.fetchAll(getAllProducts);
+  // Product.fetchAll(getAllProducts);
+  response.render('shop/index', {
+    pageTitle: 'Welcome',
+    slug: 'shop',
+  });
 };
 
-const getProductList = (request, response) => {
-  const getAllProducts = (products) => {
+const getProductList = async (request, response) => {
+  // const getAllProducts = (products) => {
+  //   response.render('shop/product-list', {
+  //     pageTitle: 'Product List',
+  //     slug: 'products',
+  //     hasProducts: products.length,
+  //     products,
+  //   });
+  // };
+
+  // Product.fetchAll(getAllProducts);
+  let products = [];
+  
+  try {
+    const [ rows, fieldData ] = await Product.fetchAll();
+
+    products = [ ...rows ];
+
     response.render('shop/product-list', {
       pageTitle: 'Product List',
       slug: 'products',
       hasProducts: products.length,
       products,
     });
-  };
+  } catch (error) {
+    console.log(`Sorry, an error occurred while fetching products: ${error.message}`);
 
-  Product.fetchAll(getAllProducts);
+    response
+      .status(500)
+      .render('shop/product-list', {
+        pageTitle: 'Product List',
+        slug: 'products',
+        hasProducts: products.length,
+        products,
+    });
+  }
 };
 
-const getProductDetails = (request, response) => {
+const getProductDetails = async (request, response) => {
   const productId = request.params.id;
-  const getProduct = (product) => {
+  // const getProduct = (product) => {
+  //   response.render('shop/product-details', {
+  //     pageTitle: 'Product Details',
+  //     slug: 'products',
+  //     product,
+  //   });
+  // };
+
+  // Product.findById(productId, getProduct);
+  let product;
+
+  try {
+    const [ row ] = await Product.findById(productId);
+
+    product = { ...row[0] };
+
     response.render('shop/product-details', {
       pageTitle: 'Product Details',
       slug: 'products',
       product,
     });
-  };
+  } catch (error) {
+    console.log(`Sorry, an error occurred while fetching product: ${error.message}`);
 
-  Product.findById(productId, getProduct);
+    response
+      .status(500)
+      .render('shop/product-details', {
+        pageTitle: 'Product Details',
+        slug: 'products',
+        product,
+      });
+  }
 };
 
 const getCart = (request, response) => {
