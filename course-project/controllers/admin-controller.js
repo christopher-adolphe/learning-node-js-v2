@@ -1,16 +1,42 @@
 const Product = require('../models/product');
 
-const getProducts = (request, response) => {
-  const getAllProducts = (products) => {
+const getProducts = async (request, response) => {
+  // const getAllProducts = (products) => {
+  //   response.render('admin/view-products', {
+  //     pageTitle: 'View Products',
+  //     slug: 'view-products',
+  //     hasProducts: products.length,
+  //     products,
+  //   });
+  // };
+
+  // Product.fetchAll(getAllProducts);
+
+  let products = [];
+
+  try {
+    const [ rows ] = await Product.fetchAll();
+
+    products = [ ...rows ];
+
     response.render('admin/view-products', {
       pageTitle: 'View Products',
       slug: 'view-products',
       hasProducts: products.length,
       products,
     });
-  };
+  } catch (error) {
+    console.log(`Sorry, an error occurred while fetching products: ${error.message}`);
 
-  Product.fetchAll(getAllProducts);
+    response
+      .status(500)
+      .render('admin/view-products', {
+        pageTitle: 'View Products',
+        slug: 'view-products',
+        hasProducts: products.length,
+        products,
+      });
+  }
 };
 
 const getProduct = (request, response) => {
@@ -29,16 +55,24 @@ const addProduct = (request, response) => {
   });
 };
 
-const createProduct = (request, response) => {
+const createProduct = async (request, response) => {
   const { title, imgUrl, description, price } = request.body;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
     const product = new Product(null, title, imgUrl, description, price);
 
-    product.save();
+    try {
+      await product.save();
+      
+      response.redirect('/');
+    } catch (error) {
+      console.log(`Sorry, an error occurred while saving product: ${error.message}`);
+      
+      response
+        .status(500)
+        .redirect('/');
+    }
   }
-
-  response.redirect('/');
 };
 
 const editProduct = (request, response) => {
