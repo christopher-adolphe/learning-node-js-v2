@@ -59,10 +59,20 @@ const createProduct = async (request, response) => {
   const { title, imgUrl, description, price } = request.body;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
-    const product = new Product(null, title, imgUrl, description, price);
+    // const product = new Product(null, title, imgUrl, description, price);
 
     try {
-      await product.save();
+      /**
+       * Using the `create()` of the Product model
+       * instance to create and insert a new product
+       * in the database
+      */
+      await Product.create({
+        title,
+        price,
+        description,
+        imageUrl: imgUrl
+      });
       
       response.redirect('/');
     } catch (error) {

@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const sequelize = require('./utils/database');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,6 +19,21 @@ app.use(shopRouter);
 app.use('/admin', adminRouter);
 app.use(errorRouter);
 
-app.listen(port, () => {
-  console.log(`Server listening... http://localhost:${port}`);
-});
+
+/**
+ * Using the `sync()` method from the sequelize
+ * instance to synchronise all defined models to
+ * the database; i.e it will create the tables for
+ * all the models we have defined
+*/
+sequelize
+  .sync()
+  .then(result => {
+    app.listen(port, () => {
+      console.log(`Server listening... http://localhost:${port}`);
+    });
+  })
+  .catch (error => {
+    console.log(error);
+  });
+
