@@ -27,12 +27,13 @@ const getProductList = async (request, response) => {
   // };
 
   // Product.fetchAll(getAllProducts);
+
   let products = [];
   
   try {
-    const [ rows, fieldData ] = await Product.fetchAll();
+    // const [ rows, fieldData ] = await Product.fetchAll();
 
-    products = [ ...rows ];
+    products = await Product.findAll();;
 
     response.render('shop/product-list', {
       pageTitle: 'Product List',
@@ -65,12 +66,10 @@ const getProductDetails = async (request, response) => {
   // };
 
   // Product.findById(productId, getProduct);
-  let product;
+  let product = null;
 
   try {
-    const [ row ] = await Product.findById(productId);
-
-    product = { ...row[0] };
+    product = await Product.findByPk(productId);
 
     response.render('shop/product-details', {
       pageTitle: 'Product Details',
