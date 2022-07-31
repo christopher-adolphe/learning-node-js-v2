@@ -12,10 +12,18 @@ const getProducts = async (request, response) => {
 
   // Product.fetchAll(getAllProducts);
 
+  const { user } = request.user;
+
   let products = [];
 
   try {
-    products = await Product.findAll();
+    // products = await Product.findAll();
+
+    /**
+     * Using the `getProducts()` association
+     * method to find all products by user
+    */
+    products = await user.getProducts();
 
     response.render('admin/view-products', {
       pageTitle: 'View Products',
@@ -55,6 +63,7 @@ const addProduct = (request, response) => {
 
 const createProduct = async (request, response) => {
   const { title, imgUrl, description, price } = request.body;
+  const { user } = request;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
     // const product = new Product(null, title, imgUrl, description, price);
@@ -65,11 +74,31 @@ const createProduct = async (request, response) => {
        * instance to create and insert a new product
        * in the database
       */
-      await Product.create({
+      // await Product.create({
+      //   title,
+      //   price,
+      //   description,
+      //   imageUrl: imgUrl,
+      //   userId: user.id
+      // });
+
+      /**
+       * When associations are created between models,
+       * Sequelize automatically adds magic associations
+       * methods to the model so that we can create a new
+       * associated object.
+       * In our case since we added the `User.hasMany(Product)`
+       * association; Sequelize creates a `createProduct()`
+       * method for us. Using this method will create a new
+       * product in the `Product` table and will set the user
+       * `id` as foreign key
+      */
+
+      await user.createProduct({
         title,
         price,
         description,
-        imageUrl: imgUrl
+        imageUrl: imgUrl,
       });
       
       response.redirect('/');
@@ -86,6 +115,7 @@ const createProduct = async (request, response) => {
 const editProduct = async (request, response) => {
   const isEditMode =  request.query.edit;
   const productId = request.params.id;
+  const user = request.user;
 
   if (!isEditMode) {
     return response.redirect('/admin/products');
@@ -107,7 +137,10 @@ const editProduct = async (request, response) => {
   let product = null;
 
   try {
-    product = await Product.findByPk(productId);
+    // product = await Product.findByPk(productId);
+    const products = await user.getProducts({ where: { id: productId } });
+
+    product = products[0]
 
     if (!product) {
       return response.redirect('/');
