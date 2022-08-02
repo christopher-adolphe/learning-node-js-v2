@@ -12,12 +12,19 @@ const getProducts = async (request, response) => {
 
   // Product.fetchAll(getAllProducts);
 
+  const { user } = request;
+  console.log('getProducts - users: ', user);
+
   let products = [];
 
   try {
-    const [ rows ] = await Product.fetchAll();
+    // products = await Product.findAll();
 
-    products = [ ...rows ];
+    /**
+     * Using the `getProducts()` association
+     * method to find all products by user
+    */
+    products = await user.getProducts();
 
     response.render('admin/view-products', {
       pageTitle: 'View Products',
@@ -57,12 +64,43 @@ const addProduct = (request, response) => {
 
 const createProduct = async (request, response) => {
   const { title, imgUrl, description, price } = request.body;
+  const { user } = request;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
-    const product = new Product(null, title, imgUrl, description, price);
+    // const product = new Product(null, title, imgUrl, description, price);
 
     try {
-      await product.save();
+      /**
+       * Using the `create()` of the Product model
+       * instance to create and insert a new product
+       * in the database
+      */
+      // await Product.create({
+      //   title,
+      //   price,
+      //   description,
+      //   imageUrl: imgUrl,
+      //   userId: user.id
+      // });
+
+      /**
+       * When associations are created between models,
+       * Sequelize automatically adds magic associations
+       * methods to the model so that we can create a new
+       * associated object.
+       * In our case since we added the `User.hasMany(Product)`
+       * association; Sequelize creates a `createProduct()`
+       * method for us. Using this method will create a new
+       * product in the `Product` table and will set the user
+       * `id` as foreign key
+      */
+
+      await user.createProduct({
+        title,
+        price,
+        description,
+        imageUrl: imgUrl,
+      });
       
       response.redirect('/');
     } catch (error) {
@@ -75,15 +113,36 @@ const createProduct = async (request, response) => {
   }
 };
 
-const editProduct = (request, response) => {
+const editProduct = async (request, response) => {
   const isEditMode =  request.query.edit;
   const productId = request.params.id;
+  const { user } = request;
 
   if (!isEditMode) {
     return response.redirect('/admin/products');
   }
 
-  Product.findById(productId, (product) => {
+  // Product.findById(productId, (product) => {
+  //   if (!product) {
+  //     return response.redirect('/');
+  //   }
+
+  //   response.render('admin/edit-product', {
+  //     pageTitle: 'Edit Product',
+  //     slug: 'edit-product',
+  //     isEditMode: !!isEditMode,
+  //     product
+  //   });
+  // });
+
+  let product = null;
+
+  try {
+    // product = await Product.findByPk(productId);
+    const products = await user.getProducts({ where: { id: productId } });
+
+    product = products[0]
+
     if (!product) {
       return response.redirect('/');
     }
@@ -94,27 +153,62 @@ const editProduct = (request, response) => {
       isEditMode: !!isEditMode,
       product
     });
-  });
+  } catch (error) {
+    console.log(`Sorry, an error occurred while fetching product: ${error.message}`);
+
+    response.redirect('/');
+  }
 };
 
-const updateProduct = (request, response) => {
+const updateProduct = async (request, response) => {
   const { productId, title, imgUrl, description, price } = request.body;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
-    const updatedProduct = new Product(productId, title, imgUrl, description, price);
+    // const updatedProduct = new Product(productId, title, imgUrl, description, price);
+    try {
+      const productToUpdate = await Product.findByPk(productId);
 
-    updatedProduct.save();
+      productToUpdate.title = title;
+      productToUpdate.imageUrl = imgUrl;
+      productToUpdate.price = price;
+      productToUpdate.description = description;
+
+
+      await productToUpdate.save();
+
+      response.redirect('/admin/products');
+    } catch (error) {
+      console.log(`Sorry, an error occurred while updating product: ${error.message}`);
+    }
   }
-
-  response.redirect('/admin/products');
 };
 
-const deleteProduct = (request, response) => {
+const deleteProduct = async (request, response) => {
   const { productId } = request.body;
 
-  Product.deleteById(productId);
+  /**
+   * In Sequelize, there are 2 approaches to delete
+   * a record. The 1st one is by using the `destroy()`
+   * method provided by the model. The 2nd is by using
+   * the `findbyPk()` method first and then use the
+   * `destroy()` on the result return by the `findbyPk()`
+   * method. In the 1st approach, we need to supply the
+   * `where` option
+  */
 
-  response.redirect('/admin/products');
+  try {
+    // 1st approach
+    // await Product.destroy({ where: { id: productId } });
+
+    // 2nd approach
+    const productToDelete = await Product.findByPk(productId);
+
+    await productToDelete.destroy();
+
+    response.redirect('/admin/products');
+  } catch (error) {
+    console.log(`Sorry, an error occurred while updating product: ${error.message}`);
+  }
 };
 
 module.exports = {

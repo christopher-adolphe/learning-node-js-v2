@@ -6,7 +6,27 @@
 
     <main class="app__main">
       <div class="container">
-        <h1>Orders page</h1>
+        <h1><%= pageTitle %></h1>
+
+        <% if (orders.length) { %>
+          <ul>
+            <% orders.forEach(order => { %>
+              <li>
+                <h4>Order ID: (<%= order.id %>)</h4>
+
+                <ul>
+                  <% order.products.forEach(product => { %>
+                    <li>
+                      <%= product.title %> (<%= product.order_item.quantity %>)
+                    </li>
+                  <% }) %>
+                </ul>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p>Sorry, you don't have any orders yet.</p>
+        <% } %>
       </div>
     </main>
   </div>

@@ -10,17 +10,23 @@
 
         <% if (cartItems.length) { %>
           <ul>
-            <% cartItems.forEach(cartItem => { %>
+            <% cartItems.forEach(product => { %>
               <li>
-                <p><%= cartItem.product.title %> (<%= cartItem.quantity %>)</p>
+                <p><%= product.title %> (<%= product.cartItem.quantity %>)</p>
 
                 <form action="/cart-delete-item" method="POST">
-                  <input type="hidden" name="productId" value="<%= cartItem.product.id %>" />
+                  <input type="hidden" name="productId" value="<%= product.id %>" />
                   <button type="submit" class="btn btn-edit">Remove</button>
                 </form>
               </li>
             <% }) %>
           </ul>
+
+          <hr />
+
+          <form action="/add-order" method="POST">
+            <button type="submit" class="btn btn-edit btn-centered">Order Now!</button>
+          </form>
         <% } else { %>
           <p>Sorry, your cart is currently empty.</p>
         <% } %>
