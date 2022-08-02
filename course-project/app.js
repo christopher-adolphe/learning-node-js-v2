@@ -89,6 +89,11 @@ sequelize
 
     return user;
   })
+  // .then(user => {
+  //   // Using the `createCart()` association method
+  //   // to create a cart related to the user
+  //   return user.createCart();
+  // })
   .then(user => {
     app.listen(port, () => {
       console.log(`Server listening... http://localhost:${port}`);
