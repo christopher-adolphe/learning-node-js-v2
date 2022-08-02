@@ -146,6 +146,11 @@ body {
   background-color: #e74c3c;
 }
 
+.btn.btn-centered {
+  display: block;
+  margin: 0 auto;
+}
+
 .product {
   display: flex;
   justify-content: flex-start;

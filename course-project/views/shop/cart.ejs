@@ -21,6 +21,12 @@
               </li>
             <% }) %>
           </ul>
+
+          <hr />
+
+          <form action="/add-order" method="POST">
+            <button type="submit" class="btn btn-edit btn-centered">Order Now!</button>
+          </form>
         <% } else { %>
           <p>Sorry, your cart is currently empty.</p>
         <% } %>

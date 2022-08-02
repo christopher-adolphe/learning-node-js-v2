@@ -12,7 +12,8 @@ const getProducts = async (request, response) => {
 
   // Product.fetchAll(getAllProducts);
 
-  const { user } = request.user;
+  const { user } = request;
+  console.log('getProducts - users: ', user);
 
   let products = [];
 
@@ -115,7 +116,7 @@ const createProduct = async (request, response) => {
 const editProduct = async (request, response) => {
   const isEditMode =  request.query.edit;
   const productId = request.params.id;
-  const user = request.user;
+  const { user } = request;
 
   if (!isEditMode) {
     return response.redirect('/admin/products');

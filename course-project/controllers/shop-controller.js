@@ -1,5 +1,4 @@
 const Product = require('../models/product');
-const Cart = require('../models/cart');
 
 const getShop = (request, response) => {
   // const getAllProducts = (products) => {
@@ -216,11 +215,45 @@ const deleteCartItem = async (request, response) => {
   }
 };
 
-const getOrders = (request, response) => {
-  response.render('shop/orders', {
-    pageTitle: 'My Orders',
-    slug: 'orders',
-  });
+const postOrder = async (request, response) => {
+  const { user } = request;
+
+  try {
+    const cart = await user.getCart();
+    const cartItems = await cart.getProducts();
+    const newOrder = await user.createOrder();
+    const result = await newOrder.addProducts(cartItems.map(item => {
+      item.order_item = { quantity: item.cartItem.quantity }
+
+      return item;
+    }));
+
+    await cart.setProducts(null);
+
+    response.redirect('/orders');
+  } catch (error) {
+    console.log(`Sorry, an error occurred while creating order: ${error.message}`);
+
+    response.redirect('/cart');
+  }
+};
+
+const getOrders = async (request, response) => {
+  const { user } = request;
+
+  try {
+    const orders = await user.getOrders({ include: ['products'] });
+
+    response.render('shop/orders', {
+      pageTitle: 'My Orders',
+      slug: 'orders',
+      orders,
+    });
+  } catch (error) {
+    console.log(`Sorry, an error occurred while fetching orders: ${error.message}`);
+
+    response.redirect('/cart');
+  }
 };
 
 const getCheckout = (request, response) => {
@@ -236,6 +269,7 @@ module.exports = {
   getProductDetails,
   getCart,
   postCart,
+  postOrder,
   getOrders,
   getCheckout,
   deleteCartItem
