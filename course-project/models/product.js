@@ -1,36 +1,38 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../utils/database');
+const { getDatabase } = require('../utils/database');
 
-/**
- * Using the `define()` method of the sequelize 
- * instance to define the attributes of the Product
- * model.
- * A model is an abstraction that represents a table
- * in a database.
- */
-const Product = sequelize.define('product', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  price: {
-    type: DataTypes.DOUBLE,
-    allowNull: false,
-  },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  imageUrl: {
-    type: DataTypes.STRING,
-    allowNull: false,
+class Product {
+  constructor(productId, productTitle, productImg, productDesc, productPrice) {
+    this.id = productId;
+    this.title = productTitle;
+    this.imageUrl = productImg;
+    this.description = productDesc;
+    this.price = productPrice;
   }
-});
+
+  async save() {
+    const db = getDatabase();
+
+    try {
+      const products = await db.collection('products');
+      const result = await products.insertOne(this);
+
+      console.log('Saved product: ', result);
+    } catch (error) {
+      console.log(`Sorry, an error occurred while saving product: ${error}`);
+    }
+  }
+
+  // static fetchAll() {
+  //   return db.execute('SELECT * FROM products');
+  // }
+
+  // static findById(id) {
+  //   return db.execute('SELECT * FROM products WHERE products.id = ?', [id]);
+  // }
+
+  // static deleteById(id) {
+
+  // }
+}
 
 module.exports = Product;

@@ -1,49 +1,38 @@
 const Product = require('../models/product');
 
 const getProducts = async (request, response) => {
-  // const getAllProducts = (products) => {
+  // const { user } = request;
+  // console.log('getProducts - users: ', user);
+
+  // let products = [];
+
+  // try {
+  //   // products = await Product.findAll();
+
+  //   /**
+  //    * Using the `getProducts()` association
+  //    * method to find all products by user
+  //   */
+  //   products = await user.getProducts();
+
   //   response.render('admin/view-products', {
   //     pageTitle: 'View Products',
   //     slug: 'view-products',
   //     hasProducts: products.length,
   //     products,
   //   });
-  // };
+  // } catch (error) {
+  //   console.log(`Sorry, an error occurred while fetching products: ${error.message}`);
 
-  // Product.fetchAll(getAllProducts);
-
-  const { user } = request;
-  console.log('getProducts - users: ', user);
-
-  let products = [];
-
-  try {
-    // products = await Product.findAll();
-
-    /**
-     * Using the `getProducts()` association
-     * method to find all products by user
-    */
-    products = await user.getProducts();
-
-    response.render('admin/view-products', {
-      pageTitle: 'View Products',
-      slug: 'view-products',
-      hasProducts: products.length,
-      products,
-    });
-  } catch (error) {
-    console.log(`Sorry, an error occurred while fetching products: ${error.message}`);
-
-    response
-      .status(500)
-      .render('admin/view-products', {
-        pageTitle: 'View Products',
-        slug: 'view-products',
-        hasProducts: products.length,
-        products,
-      });
-  }
+  //   response
+  //     .status(500)
+  //     .render('admin/view-products', {
+  //       pageTitle: 'View Products',
+  //       slug: 'view-products',
+  //       hasProducts: products.length,
+  //       products,
+  //     });
+  // }
 };
 
 const getProduct = (request, response) => {
@@ -114,15 +103,21 @@ const createProduct = async (request, response) => {
 };
 
 const editProduct = async (request, response) => {
-  const isEditMode =  request.query.edit;
-  const productId = request.params.id;
-  const { user } = request;
+  // const isEditMode =  request.query.edit;
+  // const productId = request.params.id;
+  // const { user } = request;
 
-  if (!isEditMode) {
-    return response.redirect('/admin/products');
-  }
+  // if (!isEditMode) {
+  //   return response.redirect('/admin/products');
+  // }
 
-  // Product.findById(productId, (product) => {
+  // let product = null;
+
+  // try {
+  //   const products = await user.getProducts({ where: { id: productId } });
+
+  //   product = products[0]
+
   //   if (!product) {
   //     return response.redirect('/');
   //   }
@@ -133,82 +128,62 @@ const editProduct = async (request, response) => {
   //     isEditMode: !!isEditMode,
   //     product
   //   });
-  // });
+  // } catch (error) {
+  //   console.log(`Sorry, an error occurred while fetching product: ${error.message}`);
 
-  let product = null;
-
-  try {
-    // product = await Product.findByPk(productId);
-    const products = await user.getProducts({ where: { id: productId } });
-
-    product = products[0]
-
-    if (!product) {
-      return response.redirect('/');
-    }
-
-    response.render('admin/edit-product', {
-      pageTitle: 'Edit Product',
-      slug: 'edit-product',
-      isEditMode: !!isEditMode,
-      product
-    });
-  } catch (error) {
-    console.log(`Sorry, an error occurred while fetching product: ${error.message}`);
-
-    response.redirect('/');
-  }
+  //   response.redirect('/');
+  // }
 };
 
 const updateProduct = async (request, response) => {
-  const { productId, title, imgUrl, description, price } = request.body;
+  // const { productId, title, imgUrl, description, price } = request.body;
 
-  if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
-    // const updatedProduct = new Product(productId, title, imgUrl, description, price);
-    try {
-      const productToUpdate = await Product.findByPk(productId);
+  // if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
+  //   // const updatedProduct = new Product(productId, title, imgUrl, description, price);
+  //   try {
+  //     const productToUpdate = await Product.findByPk(productId);
 
-      productToUpdate.title = title;
-      productToUpdate.imageUrl = imgUrl;
-      productToUpdate.price = price;
-      productToUpdate.description = description;
+  //     productToUpdate.title = title;
+  //     productToUpdate.imageUrl = imgUrl;
+  //     productToUpdate.price = price;
+  //     productToUpdate.description = description;
 
 
-      await productToUpdate.save();
+  //     await productToUpdate.save();
 
-      response.redirect('/admin/products');
-    } catch (error) {
-      console.log(`Sorry, an error occurred while updating product: ${error.message}`);
-    }
-  }
+  //     response.redirect('/admin/products');
+  //   } catch (error) {
+  //     console.log(`Sorry, an error occurred while updating product: ${error.message}`);
+  //   }
+  // }
 };
 
 const deleteProduct = async (request, response) => {
-  const { productId } = request.body;
+  // const { productId } = request.body;
 
-  /**
-   * In Sequelize, there are 2 approaches to delete
-   * a record. The 1st one is by using the `destroy()`
-   * method provided by the model. The 2nd is by using
-   * the `findbyPk()` method first and then use the
-   * `destroy()` on the result return by the `findbyPk()`
-   * method. In the 1st approach, we need to supply the
-   * `where` option
-  */
+  // /**
+  //  * In Sequelize, there are 2 approaches to delete
+  //  * a record. The 1st one is by using the `destroy()`
+  //  * method provided by the model. The 2nd is by using
+  //  * the `findbyPk()` method first and then use the
+  //  * `destroy()` on the result return by the `findbyPk()`
+  //  * method. In the 1st approach, we need to supply the
+  //  * `where` option
+  // */
 
-  try {
-    // 1st approach
-    // await Product.destroy({ where: { id: productId } });
+  // try {
+  //   // 1st approach
+  //   // await Product.destroy({ where: { id: productId } });
 
-    // 2nd approach
-    const productToDelete = await Product.findByPk(productId);
+  //   // 2nd approach
+  //   const productToDelete = await Product.findByPk(productId);
 
-    await productToDelete.destroy();
+  //   await productToDelete.destroy();
 
-    response.redirect('/admin/products');
-  } catch (error) {
-    console.log(`Sorry, an error occurred while updating product: ${error.message}`);
-  }
+  //   response.redirect('/admin/products');
+  // } catch (error) {
+  //   console.log(`Sorry, an error occurred while updating product: ${error.message}`);
+  // }
 };
 
 module.exports = {

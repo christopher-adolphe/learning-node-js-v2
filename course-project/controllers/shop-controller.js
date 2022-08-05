@@ -163,7 +163,6 @@ const postCart = async (request, response) => {
 
     if (existingCartItems.length) {
       existingCartItem = existingCartItems[0];
-      console.log('postCart - existingCartItem: ', existingCartItem);
     }
 
     if (existingCartItem) {
