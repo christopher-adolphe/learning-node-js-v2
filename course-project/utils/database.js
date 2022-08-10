@@ -7,7 +7,7 @@ const mongoConnect = async (serverCallback) => {
   try {
     const mongoClient = await MongoClient.connect(uri);
     console.log('Connected to Mongodb');
-    _db = await mongoClient.db();
+    _db = await mongoClient.db('online_shop');
 
     serverCallback();
   } catch(error) {

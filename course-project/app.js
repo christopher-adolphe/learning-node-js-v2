@@ -5,9 +5,9 @@ const { mongoConnect } = require('./utils/database');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// const shopRouter = require('./routes/shop-router');
+const shopRouter = require('./routes/shop-router');
 const adminRouter = require('./routes/admin-router');
-// const errorRouter = require('./routes/error-router');
+const errorRouter = require('./routes/error-router');
 
 app.set('view engine', 'ejs');
 app.set('views', './views');
@@ -33,9 +33,9 @@ app.use( async (request, response, next) => {
   next();
 });
 
-// app.use(shopRouter);
+app.use(shopRouter);
 app.use('/admin', adminRouter);
-// app.use(errorRouter);
+app.use(errorRouter);
 
 mongoConnect(() => {
   app.listen(port, () => {

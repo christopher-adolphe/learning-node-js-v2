@@ -84,12 +84,16 @@ const createProduct = async (request, response) => {
        * `id` as foreign key
       */
 
-      await user.createProduct({
-        title,
-        price,
-        description,
-        imageUrl: imgUrl,
-      });
+      // await user.createProduct({
+      //   title,
+      //   price,
+      //   description,
+      //   imageUrl: imgUrl,
+      // });
+
+      const product = new Product(title, imgUrl, description, price);
+
+      await product.save();
       
       response.redirect('/');
     } catch (error) {

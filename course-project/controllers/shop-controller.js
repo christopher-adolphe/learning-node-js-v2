@@ -32,7 +32,7 @@ const getProductList = async (request, response) => {
   try {
     // const [ rows, fieldData ] = await Product.fetchAll();
 
-    products = await Product.findAll();;
+    products = await Product.fetchAll();;
 
     response.render('shop/product-list', {
       pageTitle: 'Product List',
