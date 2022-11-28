@@ -4,35 +4,29 @@ const getProducts = async (request, response) => {
   // const { user } = request;
   // console.log('getProducts - users: ', user);
 
-  // let products = [];
+  let products = [];
 
-  // try {
-  //   // products = await Product.findAll();
+  try {
+    products = await Product.fetchAll();
 
-  //   /**
-  //    * Using the `getProducts()` association
-  //    * method to find all products by user
-  //   */
-  //   products = await user.getProducts();
+    response.render('admin/view-products', {
+      pageTitle: 'View Products',
+      slug: 'view-products',
+      hasProducts: products.length,
+      products,
+    });
+  } catch (error) {
+    console.log(`Sorry, an error occurred while fetching products: ${error.message}`);
 
-  //   response.render('admin/view-products', {
-  //     pageTitle: 'View Products',
-  //     slug: 'view-products',
-  //     hasProducts: products.length,
-  //     products,
-  //   });
-  // } catch (error) {
-  //   console.log(`Sorry, an error occurred while fetching products: ${error.message}`);
-
-  //   response
-  //     .status(500)
-  //     .render('admin/view-products', {
-  //       pageTitle: 'View Products',
-  //       slug: 'view-products',
-  //       hasProducts: products.length,
-  //       products,
-  //     });
-  // }
+    response
+      .status(500)
+      .render('admin/view-products', {
+        pageTitle: 'View Products',
+        slug: 'view-products',
+        hasProducts: products.length,
+        products,
+      });
+  }
 };
 
 const getProduct = (request, response) => {
@@ -107,36 +101,34 @@ const createProduct = async (request, response) => {
 };
 
 const editProduct = async (request, response) => {
-  // const isEditMode =  request.query.edit;
-  // const productId = request.params.id;
+  const isEditMode =  request.query.edit;
+  const productId = request.params.id;
   // const { user } = request;
 
-  // if (!isEditMode) {
-  //   return response.redirect('/admin/products');
-  // }
+  if (!isEditMode) {
+    return response.redirect('/admin/products');
+  }
 
-  // let product = null;
+  let product = null;
 
-  // try {
-  //   const products = await user.getProducts({ where: { id: productId } });
+  try {
+    product = await Product.findByPk(productId);
 
-  //   product = products[0]
+    if (!product) {
+      return response.redirect('/');
+    }
 
-  //   if (!product) {
-  //     return response.redirect('/');
-  //   }
+    response.render('admin/edit-product', {
+      pageTitle: 'Edit Product',
+      slug: 'edit-product',
+      isEditMode: !!isEditMode,
+      product
+    });
+  } catch (error) {
+    console.log(`Sorry, an error occurred while fetching product: ${error.message}`);
 
-  //   response.render('admin/edit-product', {
-  //     pageTitle: 'Edit Product',
-  //     slug: 'edit-product',
-  //     isEditMode: !!isEditMode,
-  //     product
-  //   });
-  // } catch (error) {
-  //   console.log(`Sorry, an error occurred while fetching product: ${error.message}`);
-
-  //   response.redirect('/');
-  // }
+    response.redirect('/');
+  }
 };
 
 const updateProduct = async (request, response) => {

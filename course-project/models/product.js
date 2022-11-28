@@ -36,9 +36,21 @@ class Product {
     }
   }
 
-  // static findById(id) {
-  //   return db.execute('SELECT * FROM products WHERE products.id = ?', [id]);
-  // }
+  static async findById(id) {
+    // return db.execute('SELECT * FROM products WHERE products.id = ?', [id]);
+    const db = getDatabase();
+
+    try {
+      const product = await db
+        .collection('products')
+        .find({ _id: id })
+        .next();
+
+      return product;
+    } catch (error) {
+      console.log(`Sorry, an error occurred while fetching product with id ${id}: ${error}`);
+    }
+  }
 
   // static deleteById(id) {
 

@@ -16,9 +16,22 @@ const getShop = (request, response) => {
 };
 
 const getProductList = async (request, response) => {
+  // const getAllProducts = (products) => {
+  //   response.render('shop/product-list', {
+  //     pageTitle: 'Product List',
+  //     slug: 'products',
+  //     hasProducts: products.length,
+  //     products,
+  //   });
+  // };
+
+  // Product.fetchAll(getAllProducts);
+
   let products = [];
   
   try {
+    // const [ rows, fieldData ] = await Product.fetchAll();
+
     products = await Product.fetchAll();;
 
     response.render('shop/product-list', {

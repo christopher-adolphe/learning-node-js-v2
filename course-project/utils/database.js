@@ -1,5 +1,6 @@
 const { MongoClient } = require('mongodb');
-const uri = "mongodb+srv://online-shop-admin:kqOt3IBqrR3IbQkZ@christopher-db.vztrg.mongodb.net/?retryWrites=true&w=majority";
+// const uri = "mongodb+srv://online-shop-admin:kqOt3IBqrR3IbQkZ@christopher-db.vztrg.mongodb.net/?retryWrites=true&w=majority";
+const uri = "mongodb://localhost:27017";
 // const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 let _db;
 
@@ -20,7 +21,7 @@ const getDatabase = () => {
     return _db;
   }
 
-  throw new Error('Sorry, no database found');
+  throw new Error('Sorry, no database found!');
 };
 
 module.exports = {
