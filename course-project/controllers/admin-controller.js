@@ -112,7 +112,7 @@ const editProduct = async (request, response) => {
   let product = null;
 
   try {
-    product = await Product.findByPk(productId);
+    product = await Product.findById(productId);
 
     if (!product) {
       return response.redirect('/');
@@ -132,26 +132,18 @@ const editProduct = async (request, response) => {
 };
 
 const updateProduct = async (request, response) => {
-  // const { productId, title, imgUrl, description, price } = request.body;
+  const { productId, title, imgUrl, description, price } = request.body;
 
-  // if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
-  //   // const updatedProduct = new Product(productId, title, imgUrl, description, price);
-  //   try {
-  //     const productToUpdate = await Product.findByPk(productId);
+  if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
+    const productToUpdate = new Product(title, imgUrl, description, price, productId);
+    try {
+      await productToUpdate.save();
 
-  //     productToUpdate.title = title;
-  //     productToUpdate.imageUrl = imgUrl;
-  //     productToUpdate.price = price;
-  //     productToUpdate.description = description;
-
-
-  //     await productToUpdate.save();
-
-  //     response.redirect('/admin/products');
-  //   } catch (error) {
-  //     console.log(`Sorry, an error occurred while updating product: ${error.message}`);
-  //   }
-  // }
+      response.redirect('/admin/products');
+    } catch (error) {
+      console.log(`Sorry, an error occurred while updating product: ${error.message}`);
+    }
+  }
 };
 
 const deleteProduct = async (request, response) => {

@@ -55,7 +55,7 @@ const getProductDetails = async (request, response) => {
   let product = null;
 
   try {
-    product = await Product.findByPk(productId);
+    product = await Product.findById(productId);
 
     response.render('shop/product-details', {
       pageTitle: 'Product Details',
