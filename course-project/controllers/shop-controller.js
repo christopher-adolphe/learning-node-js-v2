@@ -130,44 +130,18 @@ const getCart = async (request, response) => {
 };
 
 const postCart = async (request, response) => {
-  // const { productId } = request.body;
-
-  // Product.findById(productId, (product) => {
-  //   console.log('postCart: ', product);
-  //   Cart.addItem(productId, product.price);
-  // });
-
-  // response.redirect('/cart');
-
   const { user } = request;
   const { productId } = request.body;
-  let existingCartItem;
-  let newQuantity = 1;
 
   try {
-    const cart = await user.getCart();
-    const existingCartItems = await cart.getProducts({ where: { id: productId } });
+    const product = await Product.findById(productId);
+    console.log('shop controller - product: ', product);
+    const addToCartResult = await user.addToCart(product);
 
-    if (existingCartItems.length) {
-      existingCartItem = existingCartItems[0];
-    }
-
-    if (existingCartItem) {
-      const oldQuantity = existingCartItem.cartItem.quantity;
-
-      newQuantity = oldQuantity + 1;
-
-      cart.addProduct(existingCartItem, { through: { quantity: newQuantity }});
-
-      return response.redirect('/cart');
-    }
-
-    const newCartItem = await Product.findByPk(productId);
-
-    cart.addProduct(newCartItem, { through: { quantity: newQuantity }});
+    console.log('shop controller - postCart: ', addToCartResult);
 
     response.redirect('/cart');
-  } catch (error) {
+  } catch(error) {
     console.log(`Sorry, an error occurred while saving item to cart: ${error.message}`);
 
     response.redirect('shop/index');

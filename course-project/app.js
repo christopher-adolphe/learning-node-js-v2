@@ -35,7 +35,21 @@ app.use( async (request, response, next) => {
   try {
     const user = await User.findById('63be29e32a39b6451632fcdd');
 
-    request.user = user;
+    /**
+     * Storing the user obtained from the database
+     * in the request by setting a new `user` property
+    */
+    // request.user = user;
+
+
+    /**
+     * Storing the user obtained from the database
+     * in the request by setting a new `user` property
+     * However, here we are instantiating a new `User`
+     * object so that we also get access to the methods
+     * of the `User` model in the request
+    */
+    request.user = new User(user.name, user.email, user.cart, user._id);
 
     next();
   } catch (error) {
