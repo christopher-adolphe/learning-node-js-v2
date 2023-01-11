@@ -85,7 +85,7 @@ const createProduct = async (request, response) => {
       //   imageUrl: imgUrl,
       // });
 
-      const product = new Product(title, imgUrl, description, price);
+      const product = new Product(title, imgUrl, description, price, null, user._id);
 
       await product.save();
       
@@ -147,7 +147,7 @@ const updateProduct = async (request, response) => {
 };
 
 const deleteProduct = async (request, response) => {
-  // const { productId } = request.body;
+  const { productId } = request.body;
 
   // /**
   //  * In Sequelize, there are 2 approaches to delete
@@ -170,8 +170,18 @@ const deleteProduct = async (request, response) => {
 
   //   response.redirect('/admin/products');
   // } catch (error) {
-  //   console.log(`Sorry, an error occurred while updating product: ${error.message}`);
+  //   console.log(`Sorry, an error occurred while deleting product: ${error.message}`);
   // }
+
+  try {
+    const deletedProduct = await Product.deleteById(productId);
+
+    console.log('deleteProduct controller: ', deletedProduct);
+
+    response.redirect('/admin/products');
+  } catch (error) {
+    console.log(`Sorry, an error occurred while deleting product: ${error.message}`);
+  }
 };
 
 module.exports = {

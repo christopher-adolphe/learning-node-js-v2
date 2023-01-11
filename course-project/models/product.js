@@ -2,12 +2,13 @@ const mongodb = require('mongodb');
 const { getDatabase } = require('../utils/database');
 
 class Product {
-  constructor(productTitle, productImg, productDesc, productPrice, id) {
+  constructor(productTitle, productImg, productDesc, productPrice, id, userId) {
     this.title = productTitle;
     this.imageUrl = productImg;
     this.description = productDesc;
     this.price = productPrice;
-    this._id = new mongodb.ObjectId(id);
+    this._id = id ? new mongodb.ObjectId(id) : null;
+    this.userId = userId;
   }
 
   async save() {
@@ -82,9 +83,20 @@ class Product {
     }
   }
 
-  // static deleteById(id) {
+  static async deleteById(id) {
+    const db = getDatabase();
 
-  // }
+    try {
+      const products = await db.collection('products');
+      const result = await products.deleteOne({ _id: new mongodb.ObjectId(id) });
+
+      console.log('deleted product: ', result);
+
+      return result;
+    } catch (error) {
+      console.log(`Sorry, an error occurred while deleting product with id ${id}: ${error}`);
+    }
+  }
 }
 
 module.exports = Product;

@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const { mongoConnect } = require('./utils/database');
+const User = require('./models/user');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -30,7 +31,18 @@ app.use( async (request, response, next) => {
   // } catch (error) {
   //   console.log(`Sorry, an error occurred when fetching user: ${error.message}`);
   // }
-  next();
+
+  try {
+    const user = await User.findById('63be29e32a39b6451632fcdd');
+
+    request.user = user;
+
+    next();
+  } catch (error) {
+    console.log(`Sorry, an error occurred when fetching user: ${error.message}`);
+  }
+
+  // next();
 });
 
 app.use(shopRouter);
