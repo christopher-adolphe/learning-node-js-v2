@@ -76,40 +76,11 @@ const getProductDetails = async (request, response) => {
 };
 
 const getCart = async (request, response) => {
-  // const getCartData = (cart) => {
-  //   Product.fetchAll((products) => {
-  //     const cartItems = [];
-
-  //     products.forEach(product => {
-  //       const item = cart.items.find(item => item.id === product.id);
-
-  //       if (item) {
-  //         cartItems.push({ product, quantity: item.quantity });
-  //       }
-  //     });
-
-  //     response.render('shop/cart', {
-  //       pageTitle: 'My Cart',
-  //       slug: 'cart',
-  //       cartItems,
-  //     });
-  //   });
-  // };
-
-  // Cart.getCart(getCartData);
-
   const { user } = request;
   let cartItems = [];
 
   try {
-    /**
-     * Using the `getCart()` association
-     * method to cart by user and from the
-     * cart we get all products using the
-     * `getProducts()`
-    */
-    const cart = await user.getCart();
-    cartItems = await cart.getProducts();
+    cartItems = await user.getCart();
 
     response.render('shop/cart', {
       pageTitle: 'My Cart',
@@ -134,13 +105,9 @@ const postCart = async (request, response) => {
   const { productId } = request.body;
 
   try {
-    const product = await Product.findById(productId);
-    console.log('shop controller - product: ', product);
-    const addToCartResult = await user.addToCart(product);
+    const addToCartResult = await user.addToCart(productId);
 
-    console.log('shop controller - postCart: ', addToCartResult);
-
-    response.redirect('/cart');
+    response.redirect('/products');
   } catch(error) {
     console.log(`Sorry, an error occurred while saving item to cart: ${error.message}`);
 
@@ -149,23 +116,11 @@ const postCart = async (request, response) => {
 };
 
 const deleteCartItem = async (request, response) => {
-  // const { productId } = request.body;
-
-  // Product.findById(productId, (product) => {
-  //   Cart.deleteItem(productId, product.price);
-    
-  //   response.redirect('/cart');
-  // });
-
   const { user } = request;
   const { productId } = request.body;
 
   try {
-    const cart = await user.getCart();
-    const cartItems = await cart.getProducts({ where: { id: productId } });
-    const product = cartItems[0];
-
-    await product.cartItem.destroy();
+    await user.removeFromCart(productId);
 
     response.redirect('/cart');
   } catch (error) {
@@ -179,16 +134,7 @@ const postOrder = async (request, response) => {
   const { user } = request;
 
   try {
-    const cart = await user.getCart();
-    const cartItems = await cart.getProducts();
-    const newOrder = await user.createOrder();
-    const result = await newOrder.addProducts(cartItems.map(item => {
-      item.order_item = { quantity: item.cartItem.quantity }
-
-      return item;
-    }));
-
-    await cart.setProducts(null);
+    await user.createOrder();
 
     response.redirect('/orders');
   } catch (error) {
@@ -202,7 +148,7 @@ const getOrders = async (request, response) => {
   const { user } = request;
 
   try {
-    const orders = await user.getOrders({ include: ['products'] });
+    const orders = await user.getOrders();
 
     response.render('shop/orders', {
       pageTitle: 'My Orders',
