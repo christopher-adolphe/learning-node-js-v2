@@ -1,28 +1,30 @@
-// const mysql = require('mysql2');
+const { MongoClient } = require('mongodb');
+// const uri = "mongodb+srv://online-shop-admin:kqOt3IBqrR3IbQkZ@christopher-db.vztrg.mongodb.net/?retryWrites=true&w=majority";
+const uri = "mongodb://localhost:27017";
+// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+let _db;
 
-// const pool = mysql.createPool({
-//   host: 'localhost',
-//   user: 'root',
-//   password: 'root',
-//   database: 'online_shop',
-//   socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock'
-// });
+const mongoConnect = async (serverCallback) => {
+  try {
+    const mongoClient = await MongoClient.connect(uri);
+    console.log('Connected to Mongodb');
+    _db = await mongoClient.db('online_shop');
 
-// module.exports = pool.promise();
+    serverCallback();
+  } catch(error) {
+    console.log(`An error occurred while connecting to Mongodb: ${error}`);
+  }
+};
 
-const { Sequelize } = require('sequelize');
+const getDatabase = () => {
+  if (_db) {
+    return _db;
+  }
 
-/**
- * Creating an instance of Sequelize and
- * initializing it with the database name,
- * user and password
- */
-const sequelize = new Sequelize('online_shop', 'root', 'root', {
-  host: 'localhost',
-  dialect: 'mysql',
-  dialectOptions: {
-    socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
-  },
-});
+  throw new Error('Sorry, no database found!');
+};
 
-module.exports = sequelize;
+module.exports = {
+  mongoConnect,
+  getDatabase
+};

@@ -16,9 +16,22 @@ const getShop = (request, response) => {
 };
 
 const getProductList = async (request, response) => {
+  // const getAllProducts = (products) => {
+  //   response.render('shop/product-list', {
+  //     pageTitle: 'Product List',
+  //     slug: 'products',
+  //     hasProducts: products.length,
+  //     products,
+  //   });
+  // };
+
+  // Product.fetchAll(getAllProducts);
+
   let products = [];
   
   try {
+    // const [ rows, fieldData ] = await Product.fetchAll();
+
     products = await Product.fetchAll();;
 
     response.render('shop/product-list', {
@@ -55,7 +68,7 @@ const getProductDetails = async (request, response) => {
   let product = null;
 
   try {
-    product = await Product.findById(productId);
+    product = await Product.findByPk(productId);
 
     response.render('shop/product-details', {
       pageTitle: 'Product Details',
@@ -76,11 +89,40 @@ const getProductDetails = async (request, response) => {
 };
 
 const getCart = async (request, response) => {
+  // const getCartData = (cart) => {
+  //   Product.fetchAll((products) => {
+  //     const cartItems = [];
+
+  //     products.forEach(product => {
+  //       const item = cart.items.find(item => item.id === product.id);
+
+  //       if (item) {
+  //         cartItems.push({ product, quantity: item.quantity });
+  //       }
+  //     });
+
+  //     response.render('shop/cart', {
+  //       pageTitle: 'My Cart',
+  //       slug: 'cart',
+  //       cartItems,
+  //     });
+  //   });
+  // };
+
+  // Cart.getCart(getCartData);
+
   const { user } = request;
   let cartItems = [];
 
   try {
-    cartItems = await user.getCart();
+    /**
+     * Using the `getCart()` association
+     * method to cart by user and from the
+     * cart we get all products using the
+     * `getProducts()`
+    */
+    const cart = await user.getCart();
+    cartItems = await cart.getProducts();
 
     response.render('shop/cart', {
       pageTitle: 'My Cart',
@@ -101,14 +143,44 @@ const getCart = async (request, response) => {
 };
 
 const postCart = async (request, response) => {
+  // const { productId } = request.body;
+
+  // Product.findById(productId, (product) => {
+  //   console.log('postCart: ', product);
+  //   Cart.addItem(productId, product.price);
+  // });
+
+  // response.redirect('/cart');
+
   const { user } = request;
   const { productId } = request.body;
+  let existingCartItem;
+  let newQuantity = 1;
 
   try {
-    const addToCartResult = await user.addToCart(productId);
+    const cart = await user.getCart();
+    const existingCartItems = await cart.getProducts({ where: { id: productId } });
 
-    response.redirect('/products');
-  } catch(error) {
+    if (existingCartItems.length) {
+      existingCartItem = existingCartItems[0];
+    }
+
+    if (existingCartItem) {
+      const oldQuantity = existingCartItem.cartItem.quantity;
+
+      newQuantity = oldQuantity + 1;
+
+      cart.addProduct(existingCartItem, { through: { quantity: newQuantity }});
+
+      return response.redirect('/cart');
+    }
+
+    const newCartItem = await Product.findByPk(productId);
+
+    cart.addProduct(newCartItem, { through: { quantity: newQuantity }});
+
+    response.redirect('/cart');
+  } catch (error) {
     console.log(`Sorry, an error occurred while saving item to cart: ${error.message}`);
 
     response.redirect('shop/index');
@@ -116,11 +188,23 @@ const postCart = async (request, response) => {
 };
 
 const deleteCartItem = async (request, response) => {
+  // const { productId } = request.body;
+
+  // Product.findById(productId, (product) => {
+  //   Cart.deleteItem(productId, product.price);
+    
+  //   response.redirect('/cart');
+  // });
+
   const { user } = request;
   const { productId } = request.body;
 
   try {
-    await user.removeFromCart(productId);
+    const cart = await user.getCart();
+    const cartItems = await cart.getProducts({ where: { id: productId } });
+    const product = cartItems[0];
+
+    await product.cartItem.destroy();
 
     response.redirect('/cart');
   } catch (error) {
@@ -134,7 +218,16 @@ const postOrder = async (request, response) => {
   const { user } = request;
 
   try {
-    await user.createOrder();
+    const cart = await user.getCart();
+    const cartItems = await cart.getProducts();
+    const newOrder = await user.createOrder();
+    const result = await newOrder.addProducts(cartItems.map(item => {
+      item.order_item = { quantity: item.cartItem.quantity }
+
+      return item;
+    }));
+
+    await cart.setProducts(null);
 
     response.redirect('/orders');
   } catch (error) {
@@ -148,7 +241,7 @@ const getOrders = async (request, response) => {
   const { user } = request;
 
   try {
-    const orders = await user.getOrders();
+    const orders = await user.getOrders({ include: ['products'] });
 
     response.render('shop/orders', {
       pageTitle: 'My Orders',

@@ -1,13 +1,19 @@
 const Product = require('../models/product');
 
 const getProducts = async (request, response) => {
-  // const { user } = request;
-  // console.log('getProducts - users: ', user);
+  const { user } = request;
+  console.log('getProducts - users: ', user);
 
   let products = [];
 
   try {
-    products = await Product.fetchAll();
+    // products = await Product.findAll();
+
+    /**
+     * Using the `getProducts()` association
+     * method to find all products by user
+    */
+    products = await user.getProducts();
 
     response.render('admin/view-products', {
       pageTitle: 'View Products',
@@ -78,16 +84,12 @@ const createProduct = async (request, response) => {
        * `id` as foreign key
       */
 
-      // await user.createProduct({
-      //   title,
-      //   price,
-      //   description,
-      //   imageUrl: imgUrl,
-      // });
-
-      const product = new Product(title, imgUrl, description, price, null, user._id);
-
-      await product.save();
+      await user.createProduct({
+        title,
+        price,
+        description,
+        imageUrl: imgUrl,
+      });
       
       response.redirect('/');
     } catch (error) {
@@ -103,7 +105,7 @@ const createProduct = async (request, response) => {
 const editProduct = async (request, response) => {
   const isEditMode =  request.query.edit;
   const productId = request.params.id;
-  // const { user } = request;
+  const { user } = request;
 
   if (!isEditMode) {
     return response.redirect('/admin/products');
@@ -112,7 +114,10 @@ const editProduct = async (request, response) => {
   let product = null;
 
   try {
-    product = await Product.findById(productId);
+    // product = await Product.findByPk(productId);
+    const products = await user.getProducts({ where: { id: productId } });
+
+    product = products[0]
 
     if (!product) {
       return response.redirect('/');
@@ -135,8 +140,16 @@ const updateProduct = async (request, response) => {
   const { productId, title, imgUrl, description, price } = request.body;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
-    const productToUpdate = new Product(title, imgUrl, description, price, productId);
+    // const updatedProduct = new Product(productId, title, imgUrl, description, price);
     try {
+      const productToUpdate = await Product.findByPk(productId);
+
+      productToUpdate.title = title;
+      productToUpdate.imageUrl = imgUrl;
+      productToUpdate.price = price;
+      productToUpdate.description = description;
+
+
       await productToUpdate.save();
 
       response.redirect('/admin/products');
@@ -149,38 +162,28 @@ const updateProduct = async (request, response) => {
 const deleteProduct = async (request, response) => {
   const { productId } = request.body;
 
-  // /**
-  //  * In Sequelize, there are 2 approaches to delete
-  //  * a record. The 1st one is by using the `destroy()`
-  //  * method provided by the model. The 2nd is by using
-  //  * the `findbyPk()` method first and then use the
-  //  * `destroy()` on the result return by the `findbyPk()`
-  //  * method. In the 1st approach, we need to supply the
-  //  * `where` option
-  // */
-
-  // try {
-  //   // 1st approach
-  //   // await Product.destroy({ where: { id: productId } });
-
-  //   // 2nd approach
-  //   const productToDelete = await Product.findByPk(productId);
-
-  //   await productToDelete.destroy();
-
-  //   response.redirect('/admin/products');
-  // } catch (error) {
-  //   console.log(`Sorry, an error occurred while deleting product: ${error.message}`);
-  // }
+  /**
+   * In Sequelize, there are 2 approaches to delete
+   * a record. The 1st one is by using the `destroy()`
+   * method provided by the model. The 2nd is by using
+   * the `findbyPk()` method first and then use the
+   * `destroy()` on the result return by the `findbyPk()`
+   * method. In the 1st approach, we need to supply the
+   * `where` option
+  */
 
   try {
-    const deletedProduct = await Product.deleteById(productId);
+    // 1st approach
+    // await Product.destroy({ where: { id: productId } });
 
-    console.log('deleteProduct controller: ', deletedProduct);
+    // 2nd approach
+    const productToDelete = await Product.findByPk(productId);
+
+    await productToDelete.destroy();
 
     response.redirect('/admin/products');
   } catch (error) {
-    console.log(`Sorry, an error occurred while deleting product: ${error.message}`);
+    console.log(`Sorry, an error occurred while updating product: ${error.message}`);
   }
 };
 

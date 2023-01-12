@@ -11,7 +11,7 @@
 
         <form class="form" action="<% if (isEditMode) { %>/admin/edit-product<% } else { %>/admin/add-product<% } %>" method="POST">
           <% if (isEditMode) { %>
-            <input type="hidden" id="productId" name="productId" value="<%= product.id %>" />
+            <input type="hidden" id="productId" name="productId" value="<%= product._id %>" />
           <% } %>
           
           <div class="form__group">

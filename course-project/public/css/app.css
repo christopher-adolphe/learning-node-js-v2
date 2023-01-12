@@ -103,7 +103,7 @@ body {
 .card__image img {
   width: 15.625rem;
   height: 15.625rem;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .card__actions {
@@ -164,6 +164,7 @@ body {
 .product__img img {
   width: 100%;
   max-width: 18.75rem;
+  object-fit: contain;
 }
 
 .product__description {
