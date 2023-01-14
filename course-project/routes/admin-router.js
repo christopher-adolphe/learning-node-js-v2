@@ -13,16 +13,16 @@ const {
 
 router.get('/products', getProducts);
 
-router.get('/products/:id', getProduct);
+// router.get('/products/:id', getProduct);
 
 router.get('/add-product', addProduct);
 
-router.post('/add-product', createProduct);
+// router.post('/add-product', createProduct);
 
-router.get('/edit-product/:id', editProduct);
+// router.get('/edit-product/:id', editProduct);
 
-router.post('/edit-product/', updateProduct);
+// router.post('/edit-product/', updateProduct);
 
-router.post('/delete-product', deleteProduct);
+// router.post('/delete-product', deleteProduct);
 
 module.exports = router;

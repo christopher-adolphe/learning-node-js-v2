@@ -1,30 +1,25 @@
-const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
 // const uri = "mongodb+srv://online-shop-admin:kqOt3IBqrR3IbQkZ@christopher-db.vztrg.mongodb.net/?retryWrites=true&w=majority";
-const uri = "mongodb://localhost:27017";
+const uri = "mongodb://localhost:27017/online_shop";
 // const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-let _db;
 
-const mongoConnect = async (serverCallback) => {
+const mongooseConnect = async (app, port) => {
   try {
-    const mongoClient = await MongoClient.connect(uri);
-    console.log('Connected to Mongodb');
-    _db = await mongoClient.db('online_shop');
+    await mongoose.connect(uri, { 
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
-    serverCallback();
+    mongoose.set('strictQuery', true);
+
+    const server = app.listen(port, () => {
+      console.log(`Server listening... http://localhost:${port}`);
+    });
+
+    return server;
   } catch(error) {
     console.log(`An error occurred while connecting to Mongodb: ${error}`);
   }
 };
 
-const getDatabase = () => {
-  if (_db) {
-    return _db;
-  }
-
-  throw new Error('Sorry, no database found!');
-};
-
-module.exports = {
-  mongoConnect,
-  getDatabase
-};
+module.exports = mongooseConnect;

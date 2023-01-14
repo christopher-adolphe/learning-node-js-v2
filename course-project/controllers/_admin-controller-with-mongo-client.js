@@ -50,13 +50,42 @@ const createProduct = async (request, response) => {
   const { user } = request;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
+    // const product = new Product(null, title, imgUrl, description, price);
+
     try {
-      const product = new Product({
-        title: title,
-        imageUrl: imgUrl,
-        description: description,
-        price: price, 
-      });
+      /**
+       * Using the `create()` of the Product model
+       * instance to create and insert a new product
+       * in the database
+      */
+      // await Product.create({
+      //   title,
+      //   price,
+      //   description,
+      //   imageUrl: imgUrl,
+      //   userId: user.id
+      // });
+
+      /**
+       * When associations are created between models,
+       * Sequelize automatically adds magic associations
+       * methods to the model so that we can create a new
+       * associated object.
+       * In our case since we added the `User.hasMany(Product)`
+       * association; Sequelize creates a `createProduct()`
+       * method for us. Using this method will create a new
+       * product in the `Product` table and will set the user
+       * `id` as foreign key
+      */
+
+      // await user.createProduct({
+      //   title,
+      //   price,
+      //   description,
+      //   imageUrl: imgUrl,
+      // });
+
+      const product = new Product(title, imgUrl, description, price, null, user._id);
 
       await product.save();
       
