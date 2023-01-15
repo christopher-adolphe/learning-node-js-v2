@@ -1,14 +1,6 @@
 const Product = require('../models/product');
 
 const getShop = (request, response) => {
-  // const getAllProducts = (products) => {
-  //   response.render('shop/index', {
-  //     pageTitle: 'Welcome',
-  //     slug: 'shop',
-  //   });
-  // };
-
-  // Product.fetchAll(getAllProducts);
   response.render('shop/index', {
     pageTitle: 'Welcome',
     slug: 'shop',
@@ -19,7 +11,7 @@ const getProductList = async (request, response) => {
   let products = [];
   
   try {
-    products = await Product.fetchAll();;
+    products = await Product.find();
 
     response.render('shop/product-list', {
       pageTitle: 'Product List',
@@ -43,15 +35,6 @@ const getProductList = async (request, response) => {
 
 const getProductDetails = async (request, response) => {
   const productId = request.params.id;
-  // const getProduct = (product) => {
-  //   response.render('shop/product-details', {
-  //     pageTitle: 'Product Details',
-  //     slug: 'products',
-  //     product,
-  //   });
-  // };
-
-  // Product.findById(productId, getProduct);
   let product = null;
 
   try {
@@ -80,7 +63,9 @@ const getCart = async (request, response) => {
   let cartItems = [];
 
   try {
-    cartItems = await user.getCart();
+    const userCart = await user.populate('cart.productId');
+    
+    cartItems = userCart.cart;
 
     response.render('shop/cart', {
       pageTitle: 'My Cart',

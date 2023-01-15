@@ -1,13 +1,23 @@
 const Product = require('../models/product');
 
 const getProducts = async (request, response) => {
-  // const { user } = request;
-  // console.log('getProducts - users: ', user);
-
   let products = [];
 
   try {
-    products = await Product.fetchAll();
+    products = await Product.find();
+      /**
+       * Using the `select()` method to specify which document fields
+       * to include or exclude. Exclusion is denoted by prefixing the 
+       * field with a `-` sign
+      */
+      // .select('title price -_id')
+      /**
+       * Using the `populate()` method to specify paths which should be 
+       * populated with other documents. It can also take a second parameter
+       * to specify which document fields of the populated document to include
+       * or exclude
+      */
+      // .populate('userId', 'name');
 
     response.render('admin/view-products', {
       pageTitle: 'View Products',
@@ -52,12 +62,13 @@ const createProduct = async (request, response) => {
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
     try {
       const product = new Product({
-        title: title,
+        title,
+        description,
+        price, 
         imageUrl: imgUrl,
-        description: description,
-        price: price, 
+        userId: user,
       });
-
+      
       await product.save();
       
       response.redirect('/');
@@ -106,8 +117,14 @@ const updateProduct = async (request, response) => {
   const { productId, title, imgUrl, description, price } = request.body;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
-    const productToUpdate = new Product(title, imgUrl, description, price, productId);
     try {
+      const productToUpdate = await Product.findById(productId);
+
+      productToUpdate.title = title;
+      productToUpdate.imageUrl = imgUrl;
+      productToUpdate.price = price;
+      productToUpdate.description = description;
+
       await productToUpdate.save();
 
       response.redirect('/admin/products');
@@ -120,34 +137,8 @@ const updateProduct = async (request, response) => {
 const deleteProduct = async (request, response) => {
   const { productId } = request.body;
 
-  // /**
-  //  * In Sequelize, there are 2 approaches to delete
-  //  * a record. The 1st one is by using the `destroy()`
-  //  * method provided by the model. The 2nd is by using
-  //  * the `findbyPk()` method first and then use the
-  //  * `destroy()` on the result return by the `findbyPk()`
-  //  * method. In the 1st approach, we need to supply the
-  //  * `where` option
-  // */
-
-  // try {
-  //   // 1st approach
-  //   // await Product.destroy({ where: { id: productId } });
-
-  //   // 2nd approach
-  //   const productToDelete = await Product.findByPk(productId);
-
-  //   await productToDelete.destroy();
-
-  //   response.redirect('/admin/products');
-  // } catch (error) {
-  //   console.log(`Sorry, an error occurred while deleting product: ${error.message}`);
-  // }
-
   try {
-    const deletedProduct = await Product.deleteById(productId);
-
-    console.log('deleteProduct controller: ', deletedProduct);
+    const deletedProduct = await Product.findByIdAndRemove(productId);
 
     response.redirect('/admin/products');
   } catch (error) {

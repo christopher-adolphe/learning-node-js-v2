@@ -22,6 +22,16 @@ const productSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: true,
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    /**
+     * Using the `ref` property to indicate mongoose
+     * that the `userId` property relates to the `User`
+     * model
+    */
+    ref: 'User',
+    required: true,
   }
 });
 
