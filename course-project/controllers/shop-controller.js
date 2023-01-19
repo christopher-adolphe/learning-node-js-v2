@@ -151,8 +151,6 @@ const getOrders = async (request, response) => {
   try {
     const orders = await Order.find({ 'userId': user._id });
 
-    console.log('getOrders: ', orders);
-
     response.render('shop/orders', {
       pageTitle: 'My Orders',
       slug: 'orders',
