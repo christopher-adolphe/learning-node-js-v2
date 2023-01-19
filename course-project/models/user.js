@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
         required: true,
       }
     }
-  ]
+  ],
 });
 
 /**
@@ -68,6 +68,18 @@ userSchema.methods.removeFromCart = async function(productId) {
     return result;
   } catch (error) {
     console.log(`Sorry, an error occurred while removing product to cart with id ${productId}: ${error}`);
+  }
+}
+
+userSchema.methods.clearCart = async function() {
+  this.cart = [];
+
+  try {
+    const result = await this.save();
+
+    return result;
+  } catch (error) {
+    console.log(`Sorry, an error occurred while clearing the cart: ${error}`);
   }
 }
 

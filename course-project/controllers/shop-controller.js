@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const Order = require('../models/order');
 
 const getShop = (request, response) => {
   response.render('shop/index', {
@@ -90,7 +91,7 @@ const postCart = async (request, response) => {
   const { productId } = request.body;
 
   try {
-    const addToCartResult = await user.addToCart(productId);
+    await user.addToCart(productId);
 
     response.redirect('/products');
   } catch(error) {
@@ -119,7 +120,22 @@ const postOrder = async (request, response) => {
   const { user } = request;
 
   try {
-    await user.createOrder();
+    const userCart = await user.populate('cart.productId');
+    const order = new Order({
+      items: userCart.cart.map(cartItem => ({
+        /**
+         * Using the `_doc` property to extract all the
+         * fields for product from the `productId` field
+         * stored in the `cart` field of the `User` model
+        */
+        product: { ...cartItem.productId._doc },
+        quantity: cartItem.quantity,
+      })),
+      userId: user._id,
+    });
+
+    await order.save();
+    await user.clearCart();
 
     response.redirect('/orders');
   } catch (error) {
@@ -133,7 +149,9 @@ const getOrders = async (request, response) => {
   const { user } = request;
 
   try {
-    const orders = await user.getOrders();
+    const orders = await Order.find({ 'userId': user._id });
+
+    console.log('getOrders: ', orders);
 
     response.render('shop/orders', {
       pageTitle: 'My Orders',
