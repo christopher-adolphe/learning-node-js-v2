@@ -1,14 +1,7 @@
 const Product = require('../models/product');
+const Order = require('../models/order');
 
 const getShop = (request, response) => {
-  // const getAllProducts = (products) => {
-  //   response.render('shop/index', {
-  //     pageTitle: 'Welcome',
-  //     slug: 'shop',
-  //   });
-  // };
-
-  // Product.fetchAll(getAllProducts);
   response.render('shop/index', {
     pageTitle: 'Welcome',
     slug: 'shop',
@@ -19,7 +12,7 @@ const getProductList = async (request, response) => {
   let products = [];
   
   try {
-    products = await Product.fetchAll();;
+    products = await Product.find();
 
     response.render('shop/product-list', {
       pageTitle: 'Product List',
@@ -43,15 +36,6 @@ const getProductList = async (request, response) => {
 
 const getProductDetails = async (request, response) => {
   const productId = request.params.id;
-  // const getProduct = (product) => {
-  //   response.render('shop/product-details', {
-  //     pageTitle: 'Product Details',
-  //     slug: 'products',
-  //     product,
-  //   });
-  // };
-
-  // Product.findById(productId, getProduct);
   let product = null;
 
   try {
@@ -80,7 +64,9 @@ const getCart = async (request, response) => {
   let cartItems = [];
 
   try {
-    cartItems = await user.getCart();
+    const userCart = await user.populate('cart.productId');
+    
+    cartItems = userCart.cart;
 
     response.render('shop/cart', {
       pageTitle: 'My Cart',
@@ -105,7 +91,7 @@ const postCart = async (request, response) => {
   const { productId } = request.body;
 
   try {
-    const addToCartResult = await user.addToCart(productId);
+    await user.addToCart(productId);
 
     response.redirect('/products');
   } catch(error) {
@@ -134,7 +120,22 @@ const postOrder = async (request, response) => {
   const { user } = request;
 
   try {
-    await user.createOrder();
+    const userCart = await user.populate('cart.productId');
+    const order = new Order({
+      items: userCart.cart.map(cartItem => ({
+        /**
+         * Using the `_doc` property to extract all the
+         * fields for product from the `productId` field
+         * stored in the `cart` field of the `User` model
+        */
+        product: { ...cartItem.productId._doc },
+        quantity: cartItem.quantity,
+      })),
+      userId: user._id,
+    });
+
+    await order.save();
+    await user.clearCart();
 
     response.redirect('/orders');
   } catch (error) {
@@ -148,7 +149,7 @@ const getOrders = async (request, response) => {
   const { user } = request;
 
   try {
-    const orders = await user.getOrders();
+    const orders = await Order.find({ 'userId': user._id });
 
     response.render('shop/orders', {
       pageTitle: 'My Orders',

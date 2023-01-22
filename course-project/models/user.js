@@ -1,44 +1,40 @@
-const mongodb = require('mongodb');
-const { getDatabase } = require('../utils/database');
+const mongoose = require('mongoose');
 
-class User {
-  constructor(username, email, cart, id) {
-    this.name = username;
-    this.email = email;
-    this.cart = cart ? cart : [];
-    this._id = id ? new mongodb.ObjectId(id) : null;
-  }
-
-  async save() {
-    const db = getDatabase();
-
-    try {
-      const users = await db.collection('users');
-      const result = await users.insertOne(this);
-
-      return result;
-    } catch (error) {
-      console.log(`Sorry, an error occurred while saving user: ${error}`);
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  cart: [
+    {
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true,
+      },
+      quantity: {
+        type: Number,
+        required: true,
+      }
     }
-  }
+  ],
+});
 
-  static async findById(userId) {
-    const db = getDatabase();
-
-    try {
-      const user = await db
-        .collection('users')
-        .find({ _id: new mongodb.ObjectId(userId) })
-        .next();
-
-      return user;
-    } catch (error) {
-      console.log(`Sorry, an error occurred while fetching user with id ${userId}: ${error}`);
-    }
-  }
-
-  async addToCart(productId) {
-    const cartItemIndex = this.cart.findIndex(item => item.productId.toString() === productId.toString());
+/**
+ * Using the `methods` key on the schema to
+ * create an instance method. This allows us
+ * to add custom logic to a particular model
+ * NOTE: When definig a custom instance method
+ * on a schema, we should always use the `function`
+ * keyword so that the `this` keyword will refer
+ * to the instance of the schema
+*/
+userSchema.methods.addToCart = async function(productId) {
+  const cartItemIndex = this.cart.findIndex(item => item.productId.toString() === productId.toString());
     const updatedCartItems = [ ...this.cart ];
     let newQuantity = 1;
 
@@ -47,108 +43,46 @@ class User {
       updatedCartItems[cartItemIndex].quantity = newQuantity;
     } else {
       updatedCartItems.push({
-        productId: new mongodb.ObjectId(productId),
+        productId: productId,
         quantity: newQuantity,
       });
     }
 
-    const updatedCart = updatedCartItems;
-
-    const db = getDatabase();
+    this.cart = updatedCartItems;
 
     try {
-      const users = await db.collection('users');
-      const result = await users.updateOne(
-        { _id: this._id },
-        { $set: { cart: updatedCart } }
-      );
+      const result = await this.save();
 
       return result;
     } catch (error) {
       console.log(`Sorry, an error occurred while adding product to cart with id ${productId}: ${error}`);
     }
-  }
+}
 
-  async removeFromCart(productId) {
-    const db = getDatabase();
-    this.cart = this.cart.filter(item => item.productId.toString() !== productId.toString());
+userSchema.methods.removeFromCart = async function(productId) {
+  this.cart = this.cart.filter(item => item.productId.toString() !== productId.toString());
 
-    try {
-      const users = await db.collection('users');
-      
-      await users.updateOne(
-        { _id: this._id },
-        { $set: { cart: this.cart } }
-      )
-    } catch (error) {
-      console.log(`Sorry, an error occurred while removing product to cart with id ${productId}: ${error}`);
-    }
-  }
+  try {
+    const result = await this.save();
 
-  async getCart() {
-    const db = getDatabase();
-
-    try {
-      const productIds = this.cart.map(cartItem => cartItem.productId);
-      const products = await db
-        .collection('products')
-        .find({ _id: { $in: productIds }})
-        .toArray();
-
-      return products.map(product => {
-        const quantity = this.cart.find(cartItem => cartItem.productId.toString() === product._id.toString()).quantity;
-        
-        return {
-          ...product,
-          quantity,
-        }
-      });
-    } catch (error) {
-      console.log(`Sorry, an error occurred while retrieving products from cart: ${error}`);
-    }
-  }
-
-  async createOrder() {
-    const db = getDatabase();
-
-    try {
-      const cartProducts = await this.getCart();
-      const order = {
-        userId: this._id,
-        items: cartProducts,
-      };
-      
-      await db
-        .collection('orders')
-        .insertOne(order);
-
-      this.cart = [];
-
-      await db
-        .collection('users')
-        .updateOne(
-          { _id: this._id },
-          { $set: { cart: this.cart }}
-        );
-    } catch (error) {
-      console.log(`Sorry, an error occurred while creating order: ${error}`);
-    }
-  }
-
-  async getOrders() {
-    const db = getDatabase();
-
-    try {
-      const orders = await db
-        .collection('orders')
-        .find({ userId: this._id })
-        .toArray();
-
-      return orders;
-    } catch (error) {
-      console.log(`Sorry, an error occurred while retrieving products from cart: ${error}`);
-    }
+    return result;
+  } catch (error) {
+    console.log(`Sorry, an error occurred while removing product to cart with id ${productId}: ${error}`);
   }
 }
+
+userSchema.methods.clearCart = async function() {
+  this.cart = [];
+
+  try {
+    const result = await this.save();
+
+    return result;
+  } catch (error) {
+    console.log(`Sorry, an error occurred while clearing the cart: ${error}`);
+  }
+}
+
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;

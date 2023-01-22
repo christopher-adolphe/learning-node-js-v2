@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { mongoConnect } = require('./utils/database');
+const mongooseConnect = require('./utils/database');
 const User = require('./models/user');
 
 const app = express();
@@ -22,49 +22,19 @@ app.use(express.static(path.join(__dirname, 'public')));
  * in the Node.js app
 */
 app.use( async (request, response, next) => {
-  // try {
-  //   const user = await User.findByPk(1);
-
-  //   request.user = user;
-
-  //   next();
-  // } catch (error) {
-  //   console.log(`Sorry, an error occurred when fetching user: ${error.message}`);
-  // }
-
   try {
-    const user = await User.findById('63be29e32a39b6451632fcdd');
+    const user = await User.findById('63c3781a21b25b2215880c92');
 
-    /**
-     * Storing the user obtained from the database
-     * in the request by setting a new `user` property
-    */
-    // request.user = user;
-
-
-    /**
-     * Storing the user obtained from the database
-     * in the request by setting a new `user` property
-     * However, here we are instantiating a new `User`
-     * object so that we also get access to the methods
-     * of the `User` model in the request
-    */
-    request.user = new User(user.name, user.email, user.cart, user._id);
+    request.user = user;
 
     next();
   } catch (error) {
     console.log(`Sorry, an error occurred when fetching user: ${error.message}`);
   }
-
-  // next();
 });
 
 app.use(shopRouter);
 app.use('/admin', adminRouter);
 app.use(errorRouter);
 
-mongoConnect(() => {
-  app.listen(port, () => {
-    console.log(`Server listening... http://localhost:${port}`);
-  });
-});
+const server = mongooseConnect(app, port);

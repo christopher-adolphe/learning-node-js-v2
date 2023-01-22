@@ -1,23 +1,13 @@
 const Product = require('../models/product');
 
 const getProducts = async (request, response) => {
+  // const { user } = request;
+  // console.log('getProducts - users: ', user);
+
   let products = [];
 
   try {
-    products = await Product.find();
-      /**
-       * Using the `select()` method to specify which document fields
-       * to include or exclude. Exclusion is denoted by prefixing the 
-       * field with a `-` sign
-      */
-      // .select('title price -_id')
-      /**
-       * Using the `populate()` method to specify paths which should be 
-       * populated with other documents. It can also take a second parameter
-       * to specify which document fields of the populated document to include
-       * or exclude
-      */
-      // .populate('userId', 'name');
+    products = await Product.fetchAll();
 
     response.render('admin/view-products', {
       pageTitle: 'View Products',
@@ -60,15 +50,43 @@ const createProduct = async (request, response) => {
   const { user } = request;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
+    // const product = new Product(null, title, imgUrl, description, price);
+
     try {
-      const product = new Product({
-        title,
-        description,
-        price, 
-        imageUrl: imgUrl,
-        userId: user,
-      });
-      
+      /**
+       * Using the `create()` of the Product model
+       * instance to create and insert a new product
+       * in the database
+      */
+      // await Product.create({
+      //   title,
+      //   price,
+      //   description,
+      //   imageUrl: imgUrl,
+      //   userId: user.id
+      // });
+
+      /**
+       * When associations are created between models,
+       * Sequelize automatically adds magic associations
+       * methods to the model so that we can create a new
+       * associated object.
+       * In our case since we added the `User.hasMany(Product)`
+       * association; Sequelize creates a `createProduct()`
+       * method for us. Using this method will create a new
+       * product in the `Product` table and will set the user
+       * `id` as foreign key
+      */
+
+      // await user.createProduct({
+      //   title,
+      //   price,
+      //   description,
+      //   imageUrl: imgUrl,
+      // });
+
+      const product = new Product(title, imgUrl, description, price, null, user._id);
+
       await product.save();
       
       response.redirect('/');
@@ -117,14 +135,8 @@ const updateProduct = async (request, response) => {
   const { productId, title, imgUrl, description, price } = request.body;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
+    const productToUpdate = new Product(title, imgUrl, description, price, productId);
     try {
-      const productToUpdate = await Product.findById(productId);
-
-      productToUpdate.title = title;
-      productToUpdate.imageUrl = imgUrl;
-      productToUpdate.price = price;
-      productToUpdate.description = description;
-
       await productToUpdate.save();
 
       response.redirect('/admin/products');
@@ -137,8 +149,34 @@ const updateProduct = async (request, response) => {
 const deleteProduct = async (request, response) => {
   const { productId } = request.body;
 
+  // /**
+  //  * In Sequelize, there are 2 approaches to delete
+  //  * a record. The 1st one is by using the `destroy()`
+  //  * method provided by the model. The 2nd is by using
+  //  * the `findbyPk()` method first and then use the
+  //  * `destroy()` on the result return by the `findbyPk()`
+  //  * method. In the 1st approach, we need to supply the
+  //  * `where` option
+  // */
+
+  // try {
+  //   // 1st approach
+  //   // await Product.destroy({ where: { id: productId } });
+
+  //   // 2nd approach
+  //   const productToDelete = await Product.findByPk(productId);
+
+  //   await productToDelete.destroy();
+
+  //   response.redirect('/admin/products');
+  // } catch (error) {
+  //   console.log(`Sorry, an error occurred while deleting product: ${error.message}`);
+  // }
+
   try {
-    const deletedProduct = await Product.findByIdAndRemove(productId);
+    const deletedProduct = await Product.deleteById(productId);
+
+    console.log('deleteProduct controller: ', deletedProduct);
 
     response.redirect('/admin/products');
   } catch (error) {
