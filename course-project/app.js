@@ -7,6 +7,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const shopRouter = require('./routes/shop-router');
+const authRouter = require('./routes/auth-router');
 const adminRouter = require('./routes/admin-router');
 const errorRouter = require('./routes/error-router');
 
@@ -35,6 +36,7 @@ app.use( async (request, response, next) => {
 
 app.use(shopRouter);
 app.use('/admin', adminRouter);
+app.use(authRouter);
 app.use(errorRouter);
 
 const server = mongooseConnect(app, port);
