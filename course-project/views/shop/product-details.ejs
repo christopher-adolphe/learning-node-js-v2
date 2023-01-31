@@ -16,7 +16,10 @@
             <div class="product__description">
               <p class="product__description"><%= product.description %></p>
               <h2 class="product__price">$ <%= product.price %></h2>
-              <%- include('../partials/_add-to-cart-form.ejs') %>
+
+              <% if (isAuthenticated) { %>
+                <%- include('../partials/_add-to-cart-form.ejs') %>
+              <% } %>
             </div>
           </div>
         <% } else { %>

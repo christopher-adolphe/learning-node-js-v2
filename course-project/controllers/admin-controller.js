@@ -60,7 +60,7 @@ const addProduct = (request, response) => {
 
 const createProduct = async (request, response) => {
   const { title, imgUrl, description, price } = request.body;
-  const { user } = request.session;
+  const { user } = request;
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
     try {

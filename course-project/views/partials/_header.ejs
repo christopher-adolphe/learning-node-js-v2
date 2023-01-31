@@ -9,7 +9,8 @@
         <li>
           <a href="/products" class="<%= slug === 'products' ? 'active' : '' %>">Products</a>
         </li>
-  
+
+        <% if (isAuthenticated) { %>
         <li>
           <a href="/cart" class="<%= slug === 'cart' ? 'active' : '' %>">Cart</a>
         </li>
@@ -18,7 +19,6 @@
           <a href="/orders" class="<%= slug === 'orders' ? 'active' : '' %>">Orders</a>
         </li>
 
-        <% if (isAuthenticated) { %>
         <li>
           <a href="/admin/add-product/" class="<%= slug === 'add-product' ? 'active' : '' %>">Add Product</a>
         </li>
@@ -28,14 +28,17 @@
         </li>
         <% } %>
 
+        <% if (!isAuthenticated) { %>
         <li class="login">
           <a href="/login" class="<%= slug === 'login' ? 'active' : '' %>">Login</a>
         </li>
+        <% } else { %>
         <li>
-          <form class="form" action="/logout" method="POST">
+          <form action="/logout" method="POST">
             <button type="submit">Logout</button>
           </form>
         </li>
+        <% } %>
       </ul>
     </nav>
   </div>

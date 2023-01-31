@@ -65,7 +65,7 @@ const getProductDetails = async (request, response) => {
 };
 
 const getCart = async (request, response) => {
-  const { user } = request.session;
+  const { user } = request;
   let cartItems = [];
 
   try {
@@ -94,7 +94,7 @@ const getCart = async (request, response) => {
 };
 
 const postCart = async (request, response) => {
-  const { user } = request.session;
+  const { user } = request;
   const { productId } = request.body;
 
   try {
@@ -109,7 +109,7 @@ const postCart = async (request, response) => {
 };
 
 const deleteCartItem = async (request, response) => {
-  const { user } = request.session;
+  const { user } = request;
   const { productId } = request.body;
 
   try {
@@ -124,7 +124,7 @@ const deleteCartItem = async (request, response) => {
 };
 
 const postOrder = async (request, response) => {
-  const { user } = request.session;
+  const { user } = request;
 
   try {
     const userCart = await user.populate('cart.productId');
@@ -153,7 +153,7 @@ const postOrder = async (request, response) => {
 };
 
 const getOrders = async (request, response) => {
-  const { user } = request.session.user;
+  const { user } = request;
 
   try {
     const orders = await Order.find({ 'userId': user._id });

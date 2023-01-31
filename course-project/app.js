@@ -4,7 +4,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 
 const path = require('path');
 const mongooseConnect = require('./utils/database');
-// const User = require('./models/user');
+const User = require('./models/user');
 
 const app = express();
 const store = new MongoDBStore({
@@ -35,17 +35,21 @@ app.use(session({
  * model in the request so that it is accessible everywhere
  * in the Node.js app
 */
-// app.use( async (request, response, next) => {
-//   try {
-//     const user = await User.findById('63c3781a21b25b2215880c92');
+app.use( async (request, response, next) => {
+  if (!request.session.user) {
+    return next();
+  }
 
-//     request.user = user;
+  try {
+    const user = await User.findById(request.session.user._id);
 
-//     next();
-//   } catch (error) {
-//     console.log(`Sorry, an error occurred when fetching user: ${error.message}`);
-//   }
-// });
+    request.user = user;
+
+    next();
+  } catch (error) {
+    console.log(`Sorry, an error occurred when fetching user: ${error.message}`);
+  }
+});
 
 app.use(shopRouter);
 app.use('/admin', adminRouter);

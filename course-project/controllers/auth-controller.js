@@ -16,7 +16,14 @@ const postLogin = async (request, response) => {
     request.session.user = user;
     request.session.isLoggedIn = true;
 
-    response.redirect('/');
+    /**
+     * Using the `save()` method on the
+     * `session` object to make sure that
+     * we don't redirect too early
+    */
+    request.session.save(() => {
+      response.redirect('/');
+    });
   } catch (error) {
     console.log(`Sorry, an error occurred when user logged in: ${error.message}`);
   }
