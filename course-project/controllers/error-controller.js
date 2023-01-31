@@ -4,6 +4,7 @@ const getError = (request, response) => {
     .render('not-found', {
       pageTitle: 'Page not found',
       slug: 'not-found',
+      isAuthenticated: request.session.isLoggedIn,
     });
 }
 
