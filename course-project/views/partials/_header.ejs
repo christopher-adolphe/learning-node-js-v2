@@ -32,6 +32,9 @@
         <li class="login">
           <a href="/login" class="<%= slug === 'login' ? 'active' : '' %>">Login</a>
         </li>
+        <li class="login">
+          <a href="/signup" class="<%= slug === 'signup' ? 'active' : '' %>">Signup</a>
+        </li>
         <% } else { %>
         <li>
           <form action="/logout" method="POST">

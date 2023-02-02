@@ -1,7 +1,6 @@
 const User = require('../models/user');
 
 const getLogin = (request, response) => {
-  console.log('checking session: ', request.session.isLoggedIn);
   response.render('auth/login', {
     pageTitle: 'Login',
     slug: 'login',
@@ -29,6 +28,18 @@ const postLogin = async (request, response) => {
   }
 };
 
+const getSignup = (request, response) => {
+  response.render('auth/signup', {
+    pageTitle: 'Sign up',
+    slug: 'signup',
+    isAuthenticated: request.session.isLoggedIn,
+  });
+};
+
+const postSignup = (request, response) => {
+
+};
+
 const postLogout = (request, response) => {
   request.session.destroy((error) => {
     console.log(`Sorry, an error occurred when user logged out: ${error}`);
@@ -39,5 +50,7 @@ const postLogout = (request, response) => {
 module.exports = {
   getLogin,
   postLogin,
+  getSignup,
+  postSignup,
   postLogout,
 };
