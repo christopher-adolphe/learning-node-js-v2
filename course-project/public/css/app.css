@@ -49,6 +49,10 @@ body {
   margin-left: 1.5rem;
 }
 
+.app__header ul li.login {
+  margin-left: auto;
+}
+
 .app__header ul a {
   padding: 0.5rem 1rem;
   font-weight: 600;

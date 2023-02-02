@@ -23,7 +23,10 @@
                   </div>
                   <div class="card__actions">
                     <a href="/products/<%= product._id %>" class="btn btn-edit">Details</a>
-                    <%- include('../partials/_add-to-cart-form.ejs', { product }) %>
+
+                    <% if (isAuthenticated) { %>
+                      <%- include('../partials/_add-to-cart-form.ejs', { product }) %>
+                    <% } %>
                   </div>
                 </header>
               </article>

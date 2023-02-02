@@ -24,6 +24,7 @@ const getProducts = async (request, response) => {
       slug: 'view-products',
       hasProducts: products.length,
       products,
+      isAuthenticated: request.session.isLoggedIn,
     });
   } catch (error) {
     console.log(`Sorry, an error occurred while fetching products: ${error.message}`);
@@ -35,6 +36,7 @@ const getProducts = async (request, response) => {
         slug: 'view-products',
         hasProducts: products.length,
         products,
+        isAuthenticated: request.session.isLoggedIn,
       });
   }
 };
@@ -51,7 +53,8 @@ const addProduct = (request, response) => {
   response.render('admin/edit-product', {
     pageTitle: 'Add Product',
     slug: 'add-product',
-    isEditMode: false
+    isEditMode: false,
+    isAuthenticated: request.session.isLoggedIn,
   });
 };
 
@@ -104,7 +107,8 @@ const editProduct = async (request, response) => {
       pageTitle: 'Edit Product',
       slug: 'edit-product',
       isEditMode: !!isEditMode,
-      product
+      product,
+      isAuthenticated: request.session.isLoggedIn,
     });
   } catch (error) {
     console.log(`Sorry, an error occurred while fetching product: ${error.message}`);
