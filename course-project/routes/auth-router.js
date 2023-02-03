@@ -9,7 +9,7 @@ router.post('/login', postLogin);
 
 router.get('/signup', getSignup);
 
-router.get('/signup', postSignup);
+router.post('/signup', postSignup);
 
 router.post('/logout', postLogout);
 

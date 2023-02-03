@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+
 const User = require('../models/user');
 
 const getLogin = (request, response) => {
@@ -36,8 +38,29 @@ const getSignup = (request, response) => {
   });
 };
 
-const postSignup = (request, response) => {
+const postSignup = async (request, response) => {
+  const { email, password, confirmPassword } = request.body;
 
+  try {
+    const existingUser = await User.findOne({ email: email });
+
+    if (existingUser) {
+      return response.redirect('/signup');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const newUser = new User({
+      email,
+      password: hashedPassword,
+      cart: [],
+    });
+
+    await newUser.save();
+
+    return response.redirect('/login');
+  } catch (error) {
+    console.log(`Sorry, an error occurred while signing up new user: ${error.message}`);
+  }
 };
 
 const postLogout = (request, response) => {
