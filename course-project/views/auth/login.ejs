@@ -20,6 +20,13 @@
             <input type="password" id="password" name="password" />
           </div>
 
+          <% if (errorMessage) { %>
+            <div class="form__group form__group--error">
+              <span><%= errorMessage %></span>
+            </div>
+          <% } %>
+
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <button type="submit">Login</button>
         </form>
       </div>

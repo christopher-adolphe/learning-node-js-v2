@@ -5,7 +5,6 @@ const getShop = (request, response) => {
   response.render('shop/index', {
     pageTitle: 'Welcome',
     slug: 'shop',
-    isAuthenticated: request.session.isLoggedIn,
   });
 };
 
@@ -20,7 +19,6 @@ const getProductList = async (request, response) => {
       slug: 'products',
       hasProducts: products.length,
       products,
-      isAuthenticated: request.session.isLoggedIn,
     });
   } catch (error) {
     console.log(`Sorry, an error occurred while fetching products: ${error.message}`);
@@ -32,7 +30,6 @@ const getProductList = async (request, response) => {
         slug: 'products',
         hasProducts: products.length,
         products,
-        isAuthenticated: request.session.isLoggedIn,
     });
   }
 };
@@ -48,7 +45,6 @@ const getProductDetails = async (request, response) => {
       pageTitle: 'Product Details',
       slug: 'products',
       product,
-      isAuthenticated: request.session.isLoggedIn,
     });
   } catch (error) {
     console.log(`Sorry, an error occurred while fetching product: ${error.message}`);
@@ -59,7 +55,6 @@ const getProductDetails = async (request, response) => {
         pageTitle: 'Product Details',
         slug: 'products',
         product,
-        isAuthenticated: request.session.isLoggedIn,
       });
   }
 };
@@ -77,7 +72,6 @@ const getCart = async (request, response) => {
       pageTitle: 'My Cart',
       slug: 'cart',
       cartItems,
-      isAuthenticated: request.session.isLoggedIn,
     });
   } catch (error) {
     console.log(`Sorry, an error occurred while fetching cart: ${error.message}`);
@@ -88,7 +82,6 @@ const getCart = async (request, response) => {
         pageTitle: 'My Cart',
         slug: 'cart',
         cartItems,
-        isAuthenticated: request.session.isLoggedIn,
       });
   }
 };
@@ -162,7 +155,6 @@ const getOrders = async (request, response) => {
       pageTitle: 'My Orders',
       slug: 'orders',
       orders,
-      isAuthenticated: request.session.isLoggedIn,
     });
   } catch (error) {
     console.log(`Sorry, an error occurred while fetching orders: ${error.message}`);
@@ -175,7 +167,6 @@ const getCheckout = (request, response) => {
   response.render('shop/checkout', {
     pageTitle: 'Checkout',
     slug: 'checkout',
-    isAuthenticated: request.session.isLoggedIn,
   });
 };
 
