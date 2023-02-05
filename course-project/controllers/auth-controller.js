@@ -36,7 +36,7 @@ const postLogin = async (request, response) => {
        * our session. It takes 2 parameters; the 1st one is a key
        * and the 2nd is the value of that key
       */
-      request.flash('error', 'Invalid email or password! Please try again.')
+      request.flash('error', 'Invalid email or password! Please try again.');
       return response.redirect('/login');
     }
 
@@ -49,6 +49,7 @@ const postLogin = async (request, response) => {
     const passwordMatches = await bcrypt.compare(password, user.password);
 
     if (!passwordMatches) {
+      request.flash('error', 'Invalid password! Please try again.');
       return response.redirect('/login');
     }
 
@@ -69,9 +70,23 @@ const postLogin = async (request, response) => {
 };
 
 const getSignup = (request, response) => {
+  let errorMessage = request.flash('error');
+
+  if (errorMessage.length > 0) {
+    /**
+     * Using the `flash()` method added to the request object
+     * by the `flash` middleware to pull the error message in
+     * the session by passing only the key as parameter
+    */
+    errorMessage = errorMessage[0];
+  } else {
+    errorMessage = null;
+  }
+
   response.render('auth/signup', {
     pageTitle: 'Sign up',
     slug: 'signup',
+    errorMessage,
   });
 };
 
@@ -82,6 +97,7 @@ const postSignup = async (request, response) => {
     const existingUser = await User.findOne({ email: email });
 
     if (existingUser) {
+      request.flash('error', 'This email already exist! Please use a different one.')
       return response.redirect('/signup');
     }
 
@@ -106,7 +122,7 @@ const postSignup = async (request, response) => {
 
 const postLogout = (request, response) => {
   request.session.destroy((error) => {
-    console.log(`Sorry, an error occurred when user logged out: ${error}`);
+    // console.log(`Sorry, an error occurred when user logged out: ${error}`);
     response.redirect('/');
   });
 }
