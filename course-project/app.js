@@ -1,6 +1,10 @@
 const express = require('express');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
+const csrf = require('csurf');
+const flash = require('connect-flash');
+
+const addLocals = require('./middleware/addLocals');
 
 const path = require('path');
 const mongooseConnect = require('./utils/database');
@@ -11,6 +15,12 @@ const store = new MongoDBStore({
   uri: 'mongodb://localhost:27017/online_shop',
   collection: 'sessions',
 });
+/**
+ * Using the `csrf()` function to get a middleware
+ * that will handle the Cross Site Request Forgery
+ * protection
+*/
+const csrfProtection = csrf();
 const port = process.env.PORT || 3000;
 
 const shopRouter = require('./routes/shop-router');
@@ -28,7 +38,21 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store,
-}))
+}));
+/**
+ * Instructing our node.js application to use
+ * the `csrfProtection` middleware after we
+ * initialize the session
+*/
+app.use(csrfProtection);
+/**
+ * Instructing our node.js application to use
+ * the `flash` middleware after we
+ * initialize the session. The flash middleware
+ * allows us to store information temporarily
+ * in the user's sesssion
+*/
+app.use(flash());
 
 /**
  * Registering a middleware function to store the user
@@ -50,6 +74,14 @@ app.use( async (request, response, next) => {
     console.log(`Sorry, an error occurred when fetching user: ${error.message}`);
   }
 });
+
+/**
+ * Instructing our node.js application to use
+ * the `addLocals` middleware to add session
+ * and csrf token details to each view being
+ * rendered
+*/
+app.use(addLocals);
 
 app.use(shopRouter);
 app.use('/admin', adminRouter);

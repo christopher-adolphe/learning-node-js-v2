@@ -32,9 +32,13 @@
         <li class="login">
           <a href="/login" class="<%= slug === 'login' ? 'active' : '' %>">Login</a>
         </li>
+        <li>
+          <a href="/signup" class="<%= slug === 'signup' ? 'active' : '' %>">Signup</a>
+        </li>
         <% } else { %>
         <li>
           <form action="/logout" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <button type="submit">Logout</button>
           </form>
         </li>

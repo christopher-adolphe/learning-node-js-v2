@@ -13,18 +13,6 @@ const mongooseConnect = async (app, port) => {
 
     mongoose.set('strictQuery', true);
 
-    const user = await User.findOne();
-
-    if (!user) {
-      const newUser = new User({
-        name: 'Christopher',
-        email: 'christopher@gmail.com',
-        cart: [],
-      });
-
-      await newUser.save();
-    }
-
     const server = app.listen(port, () => {
       console.log(`Server listening... http://localhost:${port}`);
     });
