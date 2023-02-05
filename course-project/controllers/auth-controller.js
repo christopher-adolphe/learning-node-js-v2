@@ -4,13 +4,21 @@ const sendGridTransport = require('nodemailer-sendgrid-transport');
 const sendGridMail = require('@sendgrid/mail');
 
 const User = require('../models/user');
-const transporter = nodemailer.createTransport(sendGridTransport({
-  auth: {
-    api_key: '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',
-  },
-}));
+// const transporter = nodemailer.createTransport(sendGridTransport({
+//   auth: {
+//     api_key: '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',
+//   },
+// }));
 
-sendGridMail.setApiKey('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');
+// sendGridMail.setApiKey('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');
+const transporter = nodemailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "d56783be929a2f",
+    pass: "cfb402f84994fd"
+  }
+});
 
 const getLogin = (request, response) => {
   let errorMessage = request.flash('error');
@@ -131,15 +139,15 @@ const postSignup = async (request, response) => {
       html: '<h1>You successfully signed up to Online Shop!</h1>',
     };
 
-    // transporter.sendMail(message);
+    transporter.sendMail(message);
 
-    await sendGridMail.send(message, (error) => {
-      if (error) {
-        console.log(`Sorry, an error occurred while sending signing up mail to user: ${error.message}`);
-      } else {
-        console.log(`Successfully sent signing up mail to user.`);
-      }
-    });
+    // await sendGridMail.send(message, (error) => {
+    //   if (error) {
+    //     console.log(`Sorry, an error occurred while sending signing up mail to user: ${error.message}`);
+    //   } else {
+    //     console.log(`Successfully sent signing up mail to user.`);
+    //   }
+    // });
 
     return response.redirect('/login');
   } catch (error) {
