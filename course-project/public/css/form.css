@@ -48,3 +48,11 @@ button {
   height: unset;
   min-height: 6.25rem;
 }
+
+.form__link {
+  display: block;
+  margin-top: 1rem;
+  text-align: right;
+  text-decoration: none;
+  color: #191921;
+}

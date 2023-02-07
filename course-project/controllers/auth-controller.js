@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const sendGridTransport = require('nodemailer-sendgrid-transport');
 const sendGridMail = require('@sendgrid/mail');
@@ -160,7 +161,83 @@ const postLogout = (request, response) => {
     // console.log(`Sorry, an error occurred when user logged out: ${error}`);
     response.redirect('/');
   });
-}
+};
+
+const getResetPassword = (request, response) => {
+  let errorMessage = request.flash('error');
+
+  if (errorMessage.length > 0) {
+    /**
+     * Using the `flash()` method added to the request object
+     * by the `flash` middleware to pull the error message in
+     * the session by passing only the key as parameter
+    */
+    errorMessage = errorMessage[0];
+  } else {
+    errorMessage = null;
+  }
+
+  response.render('auth/reset-password', {
+    pageTitle: 'Reset your password',
+    slug: 'reset',
+    errorMessage,
+  });
+};
+
+const postResetPassword = (request, response) => {
+  const { email } = request.body;
+  /**
+   * Using the `crypto` module from Node.js to
+   * create a token from random bytes
+  */
+ crypto.randomBytes(32, async (error, buffer) => {
+  if (error) {
+    console.log('randomBytes error: ', error);
+
+    return response.redirect('/reset-password');
+  }
+
+  const token = buffer.toString('hex');
+
+  
+  try {
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      request.flash('error', 'Sorry, could not find any account with that email.');
+
+      return response.redirect('/reset-password');
+    }
+
+    user.resetToken = token;
+
+    /**
+     * Setting the `resetTokenExpiry` to the current
+     * date plus one hour (converted to milliseconds 1h -> 3,600,000ms)
+    */
+    user.resetTokenExpiry = Date.now() + 3600000;
+
+    await user.save();
+
+    const message = {
+      to: email,
+      from: 'christopher.adolphe@gmail.com',
+      subject: 'Reset Password',
+      html: `
+        <p>You requested a password reset.</p>
+        <p>Click this <a href="http://localhost:3000/reset-password/${token}">link</a> to set a new password.</p>
+        <p>Please note that the above link is only valid for one hour.</p>
+      `,
+    };
+
+    transporter.sendMail(message);
+
+    response.redirect('/login');
+  } catch (error) {
+    console.log(`Sorry, an error occurred while looking for user to reset password: ${error.message}`);
+  }
+ });
+};
 
 module.exports = {
   getLogin,
@@ -168,4 +245,6 @@ module.exports = {
   getSignup,
   postSignup,
   postLogout,
+  getResetPassword,
+  postResetPassword,
 };
