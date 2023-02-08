@@ -179,7 +179,7 @@ const getResetPassword = (request, response) => {
 
   response.render('auth/reset-password', {
     pageTitle: 'Reset your password',
-    slug: 'reset',
+    slug: 'reset-password',
     errorMessage,
   });
 };
@@ -239,6 +239,61 @@ const postResetPassword = (request, response) => {
  });
 };
 
+const getChangePassword = async (request, response) => {
+  try {
+    const { token } = request.params;
+    const user = await User.findOne({ resetToken: token, resetTokenExpiry: { $gt: Date.now() } });
+    let errorMessage = request.flash('error');
+
+    if (errorMessage.length > 0) {
+      errorMessage = errorMessage[0];
+    } else {
+      errorMessage = null;
+    }
+
+    if (!user) {
+      request.flash('error', 'Sorry, the link to reset your password is no more valid.');
+
+      return response.render('auth/change-password', {
+        pageTitle: 'Change your password',
+        slug: 'change-password',
+        errorMessage,
+        userId: null,
+        resetToken: null,
+      });
+    }
+
+    response.render('auth/change-password', {
+      pageTitle: 'Change your password',
+      slug: 'change-password',
+      errorMessage,
+      userId: user._id.toString(),
+      resetToken: token,
+    });
+  } catch (error) {
+    console.log(`Sorry, an error occurred while looking for user to reset password: ${error.message}`);
+  }
+};
+
+const postChangePassword = async (request, response) => {
+  const { password, userId, resetToken } = request.body;
+
+  try {
+    const user = await User.findOne({ _id: userId, resetToken: resetToken, resetTokenExpiry: { $gt: Date.now() } });
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    user.password = hashedPassword;
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
+
+    await user.save();
+
+    return response.redirect('/login');
+  } catch (error) {
+    console.log(`Sorry, an error occurred while changing user's password: ${error.message}`);
+  }
+};
+
 module.exports = {
   getLogin,
   postLogin,
@@ -247,4 +302,6 @@ module.exports = {
   postLogout,
   getResetPassword,
   postResetPassword,
+  getChangePassword,
+  postChangePassword,
 };
