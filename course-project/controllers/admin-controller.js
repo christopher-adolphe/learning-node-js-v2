@@ -1,10 +1,18 @@
 const Product = require('../models/product');
 
 const getProducts = async (request, response) => {
+  const { user } = request;
   let products = [];
 
   try {
-    products = await Product.find();
+    /**
+     * Querying for products by filtering them by
+     * user id so that the user only views products
+     * that he/she created; meaning that the user
+     * is only authorized to view products he/she
+     * created
+    */
+    products = await Product.find({ userId: user._id });
       /**
        * Using the `select()` method to specify which document fields
        * to include or exclude. Exclusion is denoted by prefixing the 
@@ -85,7 +93,7 @@ const createProduct = async (request, response) => {
 const editProduct = async (request, response) => {
   const isEditMode =  request.query.edit;
   const productId = request.params.id;
-  // const { user } = request;
+  const { user } = request;
 
   if (!isEditMode) {
     return response.redirect('/admin/products');
@@ -96,7 +104,7 @@ const editProduct = async (request, response) => {
   try {
     product = await Product.findById(productId);
 
-    if (!product) {
+    if (!product || product.userId.toString() !== user._id.toString()) {
       return response.redirect('/');
     }
 
@@ -136,9 +144,21 @@ const updateProduct = async (request, response) => {
 
 const deleteProduct = async (request, response) => {
   const { productId } = request.body;
+  const { user } = request;
 
   try {
-    const deletedProduct = await Product.findByIdAndRemove(productId);
+    /**
+     * Using the `findByIdAndRemove()` method to delete a
+     * product by filtering with a given `_id`
+    */
+    // const deletedProduct = await Product.findByIdAndRemove(productId);
+
+    /**
+     * Using the `deleteOne()` method to delete a
+     * product so that we can authorize if the user
+     * is allow to delete the product
+    */
+    const deletedProduct = await Product.deleteOne({ _id: productId, userId: user._id });
 
     response.redirect('/admin/products');
   } catch (error) {
