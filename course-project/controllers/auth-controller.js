@@ -1,8 +1,9 @@
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const sendGridTransport = require('nodemailer-sendgrid-transport');
-const sendGridMail = require('@sendgrid/mail');
+const { validationResult } = require('express-validator/check');
+// const sendGridTransport = require('nodemailer-sendgrid-transport');
+// const sendGridMail = require('@sendgrid/mail');
 
 const User = require('../models/user');
 // const transporter = nodemailer.createTransport(sendGridTransport({
@@ -111,6 +112,34 @@ const getSignup = (request, response) => {
 
 const postSignup = async (request, response) => {
   const { email, password, confirmPassword } = request.body;
+  /**
+   * Using the `validationResult()` function to
+   * extract errors registered by the `check()`
+   * middleware. The `validationResult()` function
+   * return a object containing a `formatter` and an
+   * `errors` array. The `errors` array will contain
+   * the error object like:
+   * [
+   *  {
+   *    value: 'test',
+   *    msg: 'Please enter a valid email!',
+   *    param: 'email',
+   *    location: 'body'
+   *  }
+   *]
+
+   * We can then pass the `msg` field to our view
+   * to give feedback to the user
+  */
+  const errors = validationResult(request);
+
+  if (!errors.isEmpty()) {
+    return response.status(422).render('auth/signup', {
+      pageTitle: 'Sign up',
+      slug: 'signup',
+      errorMessage: errors.array()[0].msg,
+    });
+  }
 
   try {
     const existingUser = await User.findOne({ email: email });

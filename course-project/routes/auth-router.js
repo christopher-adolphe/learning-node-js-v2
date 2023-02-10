@@ -1,4 +1,6 @@
 const express = require('express');
+const { check } = require('express-validator/check');
+
 const router = express.Router();
 
 const {
@@ -19,7 +21,16 @@ router.post('/login', postLogin);
 
 router.get('/signup', getSignup);
 
-router.post('/signup', postSignup);
+/**
+ * Using the `check()` middleware function from
+ * `express-validator` to enforce a validation
+ * on the email property in the request body
+ * The `check()` middleware will add the errors
+ * resulting from the validation to the request.
+ * These errors can then be extracted at the controller
+ * level using the `validationResult`
+*/
+router.post('/signup', check('email').isEmail().withMessage('Please enter a valid email!'), postSignup);
 
 router.post('/logout', postLogout);
 
