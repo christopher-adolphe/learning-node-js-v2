@@ -40,25 +40,46 @@ const getLogin = (request, response) => {
     pageTitle: 'Login',
     slug: 'login',
     errorMessage,
+    previousInput: {
+      email: '',
+      password: '',
+    },
+    errors: [],
   });
 };
 
 const postLogin = async (request, response) => {
   const { email, password } = request.body;
 
+  const errors = validationResult(request);
+
+  if (!errors.isEmpty()) {
+    return response.status(422).render('auth/login', {
+      pageTitle: 'Login',
+      slug: 'login',
+      errorMessage: errors.array()[0].msg,
+      previousInput: { email, password },
+      errors: errors.array(),
+    });
+  }
+
   try {
     const user = await User.findOne({ email: email });
 
-    if (!user) {
-      /**
-       * Using the `flash()` method added to the request object
-       * by the `flash` middleware to flash an error message in
-       * our session. It takes 2 parameters; the 1st one is a key
-       * and the 2nd is the value of that key
-      */
-      request.flash('error', 'Invalid email or password! Please try again.');
-      return response.redirect('/login');
-    }
+    /**
+     * Moving the `user` to a custom async validator in
+     * `auth-router`
+    */
+    // if (!user) {
+    //   /**
+    //    * Using the `flash()` method added to the request object
+    //    * by the `flash` middleware to flash an error message in
+    //    * our session. It takes 2 parameters; the 1st one is a key
+    //    * and the 2nd is the value of that key
+    //   */
+    //   request.flash('error', 'Invalid email or password! Please try again.');
+    //   return response.redirect('/login');
+    // }
 
     /**
      * Using the `compare()` method from bcrypt to
@@ -107,6 +128,12 @@ const getSignup = (request, response) => {
     pageTitle: 'Sign up',
     slug: 'signup',
     errorMessage,
+    previousInput: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    errors: [],
   });
 };
 
@@ -138,16 +165,22 @@ const postSignup = async (request, response) => {
       pageTitle: 'Sign up',
       slug: 'signup',
       errorMessage: errors.array()[0].msg,
+      previousInput: { email, password, confirmPassword },
+      errors: errors.array(),
     });
   }
 
   try {
-    const existingUser = await User.findOne({ email: email });
+    /**
+     * Moving this `existingUser` check a custom
+     * validator in the `auth-router
+    */
+    // const existingUser = await User.findOne({ email: email });
 
-    if (existingUser) {
-      request.flash('error', 'This email already exist! Please use a different one.')
-      return response.redirect('/signup');
-    }
+    // if (existingUser) {
+    //   request.flash('error', 'This email already exist! Please use a different one.')
+    //   return response.redirect('/signup');
+    // }
 
     /**
      * Using the `hash()` method from bcrypt to
