@@ -29,6 +29,8 @@ router.post(
       .custom(async (value, { req }) => {
         const user = await User.findOne({ email: value });
 
+        console.log('async validation: ', user);
+
         if (!user) {
           return Promise.reject('Sorry, invalid email or password! Please try again.')
         }
