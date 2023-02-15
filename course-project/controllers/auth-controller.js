@@ -107,6 +107,12 @@ const postLogin = async (request, response) => {
     });
   } catch (error) {
     console.log(`Sorry, an error occurred when user logged in: ${error.message}`);
+
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
   }
 };
 
@@ -215,6 +221,12 @@ const postSignup = async (request, response) => {
     return response.redirect('/login');
   } catch (error) {
     console.log(`Sorry, an error occurred while signing up new user: ${error.message}`);
+
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
   }
 };
 
@@ -297,6 +309,12 @@ const postResetPassword = (request, response) => {
     response.redirect('/login');
   } catch (error) {
     console.log(`Sorry, an error occurred while looking for user to reset password: ${error.message}`);
+
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
   }
  });
 };
@@ -334,6 +352,12 @@ const getChangePassword = async (request, response) => {
     });
   } catch (error) {
     console.log(`Sorry, an error occurred while looking for user to reset password: ${error.message}`);
+
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
   }
 };
 
@@ -353,6 +377,12 @@ const postChangePassword = async (request, response) => {
     return response.redirect('/login');
   } catch (error) {
     console.log(`Sorry, an error occurred while changing user's password: ${error.message}`);
+
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
   }
 };
 

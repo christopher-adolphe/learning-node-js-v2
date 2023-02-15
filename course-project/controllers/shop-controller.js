@@ -97,7 +97,12 @@ const postCart = async (request, response) => {
   } catch(error) {
     console.log(`Sorry, an error occurred while saving item to cart: ${error.message}`);
 
-    response.redirect('shop/index');
+    // response.redirect('shop/index');
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
   }
 };
 
@@ -112,7 +117,12 @@ const deleteCartItem = async (request, response) => {
   } catch (error) {
     console.log(`Sorry, an error occurred while deleting item from cart: ${error.message}`);
 
-    response.redirect('shop/index');
+    // response.redirect('shop/index');
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
   }
 };
 
@@ -141,7 +151,12 @@ const postOrder = async (request, response) => {
   } catch (error) {
     console.log(`Sorry, an error occurred while creating order: ${error.message}`);
 
-    response.redirect('/cart');
+    // response.redirect('/cart');
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
   }
 };
 
@@ -159,7 +174,12 @@ const getOrders = async (request, response) => {
   } catch (error) {
     console.log(`Sorry, an error occurred while fetching orders: ${error.message}`);
 
-    response.redirect('/cart');
+    // response.redirect('/cart');
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
   }
 };
 

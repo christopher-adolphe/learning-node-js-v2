@@ -67,11 +67,21 @@ app.use( async (request, response, next) => {
   try {
     const user = await User.findById(request.session.user._id);
 
+    if (!user) {
+      return next();
+    }
+
     request.user = user;
 
     next();
   } catch (error) {
     console.log(`Sorry, an error occurred when fetching user: ${error.message}`);
+
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
   }
 });
 
@@ -87,5 +97,15 @@ app.use(shopRouter);
 app.use('/admin', adminRouter);
 app.use(authRouter);
 app.use(errorRouter);
+
+/**
+ * Adding an Express error handling middleware
+ * which will be called whenever a `next()`
+ * function is called with an error passed to
+ * it as argument
+*/
+app.use((error, request, response, next) => {
+  response.redirect('/500');
+});
 
 const server = mongooseConnect(app, port);
