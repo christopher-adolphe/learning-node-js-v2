@@ -1,8 +1,9 @@
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const sendGridTransport = require('nodemailer-sendgrid-transport');
-const sendGridMail = require('@sendgrid/mail');
+const { validationResult } = require('express-validator/check');
+// const sendGridTransport = require('nodemailer-sendgrid-transport');
+// const sendGridMail = require('@sendgrid/mail');
 
 const User = require('../models/user');
 // const transporter = nodemailer.createTransport(sendGridTransport({
@@ -39,25 +40,46 @@ const getLogin = (request, response) => {
     pageTitle: 'Login',
     slug: 'login',
     errorMessage,
+    previousInput: {
+      email: '',
+      password: '',
+    },
+    errors: [],
   });
 };
 
 const postLogin = async (request, response) => {
   const { email, password } = request.body;
 
+  const errors = validationResult(request);
+
+  if (!errors.isEmpty()) {
+    return response.status(422).render('auth/login', {
+      pageTitle: 'Login',
+      slug: 'login',
+      errorMessage: errors.array()[0].msg,
+      previousInput: { email, password },
+      errors: errors.array(),
+    });
+  }
+
   try {
     const user = await User.findOne({ email: email });
 
-    if (!user) {
-      /**
-       * Using the `flash()` method added to the request object
-       * by the `flash` middleware to flash an error message in
-       * our session. It takes 2 parameters; the 1st one is a key
-       * and the 2nd is the value of that key
-      */
-      request.flash('error', 'Invalid email or password! Please try again.');
-      return response.redirect('/login');
-    }
+    /**
+     * Moving the `user` to a custom async validator in
+     * `auth-router`
+    */
+    // if (!user) {
+    //   /**
+    //    * Using the `flash()` method added to the request object
+    //    * by the `flash` middleware to flash an error message in
+    //    * our session. It takes 2 parameters; the 1st one is a key
+    //    * and the 2nd is the value of that key
+    //   */
+    //   request.flash('error', 'Invalid email or password! Please try again.');
+    //   return response.redirect('/login');
+    // }
 
     /**
      * Using the `compare()` method from bcrypt to
@@ -106,19 +128,59 @@ const getSignup = (request, response) => {
     pageTitle: 'Sign up',
     slug: 'signup',
     errorMessage,
+    previousInput: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    errors: [],
   });
 };
 
 const postSignup = async (request, response) => {
   const { email, password, confirmPassword } = request.body;
+  /**
+   * Using the `validationResult()` function to
+   * extract errors registered by the `check()`
+   * middleware. The `validationResult()` function
+   * return a object containing a `formatter` and an
+   * `errors` array. The `errors` array will contain
+   * the error object like:
+   * [
+   *  {
+   *    value: 'test',
+   *    msg: 'Please enter a valid email!',
+   *    param: 'email',
+   *    location: 'body'
+   *  }
+   *]
+
+   * We can then pass the `msg` field to our view
+   * to give feedback to the user
+  */
+  const errors = validationResult(request);
+
+  if (!errors.isEmpty()) {
+    return response.status(422).render('auth/signup', {
+      pageTitle: 'Sign up',
+      slug: 'signup',
+      errorMessage: errors.array()[0].msg,
+      previousInput: { email, password, confirmPassword },
+      errors: errors.array(),
+    });
+  }
 
   try {
-    const existingUser = await User.findOne({ email: email });
+    /**
+     * Moving this `existingUser` check a custom
+     * validator in the `auth-router
+    */
+    // const existingUser = await User.findOne({ email: email });
 
-    if (existingUser) {
-      request.flash('error', 'This email already exist! Please use a different one.')
-      return response.redirect('/signup');
-    }
+    // if (existingUser) {
+    //   request.flash('error', 'This email already exist! Please use a different one.')
+    //   return response.redirect('/signup');
+    // }
 
     /**
      * Using the `hash()` method from bcrypt to

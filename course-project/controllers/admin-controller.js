@@ -1,3 +1,5 @@
+const { validationResult } = require('express-validator/check');
+
 const Product = require('../models/product');
 
 const getProducts = async (request, response) => {
@@ -60,12 +62,28 @@ const addProduct = (request, response) => {
     pageTitle: 'Add Product',
     slug: 'add-product',
     isEditMode: false,
+    hasError: false,
+    errorMessage: null,
+    errors:[],
   });
 };
 
 const createProduct = async (request, response) => {
   const { title, imgUrl, description, price } = request.body;
   const { user } = request;
+  const errors = validationResult(request);
+
+  if (!errors.isEmpty()) {
+    return response.status(422).render('admin/edit-product', {
+      pageTitle: 'Add Product',
+      slug: 'add-product',
+      isEditMode: false,
+      hasError: true,
+      errorMessage: errors.array()[0].msg,
+      product: { title, imgUrl, description, price },
+      errors: errors.array(),
+    });
+  }
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
     try {
@@ -112,7 +130,10 @@ const editProduct = async (request, response) => {
       pageTitle: 'Edit Product',
       slug: 'edit-product',
       isEditMode: !!isEditMode,
+      hasError: false,
       product,
+      errorMessage: null,
+      errors:[],
     });
   } catch (error) {
     console.log(`Sorry, an error occurred while fetching product: ${error.message}`);
@@ -123,6 +144,19 @@ const editProduct = async (request, response) => {
 
 const updateProduct = async (request, response) => {
   const { productId, title, imgUrl, description, price } = request.body;
+  const errors = validationResult(request);
+
+  if (!errors.isEmpty()) {
+    return response.status(422).render('admin/edit-product', {
+      pageTitle: 'Edit Product',
+      slug: 'edit-product',
+      isEditMode: true,
+      hasError: true,
+      errorMessage: errors.array()[0].msg,
+      product: { _id: productId, title, imageUrl: imgUrl, description, price },
+      errors: errors.array(),
+    });
+  }
 
   if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
     try {
