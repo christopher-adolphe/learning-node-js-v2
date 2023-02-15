@@ -68,7 +68,7 @@ const addProduct = (request, response) => {
   });
 };
 
-const createProduct = async (request, response) => {
+const createProduct = async (request, response, next) => {
   const { title, imgUrl, description, price } = request.body;
   const { user } = request;
   const errors = validationResult(request);
@@ -100,10 +100,23 @@ const createProduct = async (request, response) => {
       response.redirect('/');
     } catch (error) {
       console.log(`Sorry, an error occurred while saving product: ${error.message}`);
-      
-      response
-        .status(500)
-        .redirect('/');
+      // response
+      //   .status(500)
+      //   .redirect('/');
+
+      /**
+       * Instead of redirecting with a status of 500,
+       * we can instantiate a new Error object using
+       * the `Error()` constructor and then pass it
+       * to the `next()` function. This will notify
+       * express to skip all other middlewares to go
+       * to a special error handling middleware
+      */
+      const failure = new Error(error);
+
+      failure.httpStatusCode = 500;
+
+      return next(failure);
     }
   }
 };
@@ -138,7 +151,12 @@ const editProduct = async (request, response) => {
   } catch (error) {
     console.log(`Sorry, an error occurred while fetching product: ${error.message}`);
 
-    response.redirect('/');
+    // response.redirect('/');
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
   }
 };
 
@@ -172,6 +190,12 @@ const updateProduct = async (request, response) => {
       response.redirect('/admin/products');
     } catch (error) {
       console.log(`Sorry, an error occurred while updating product: ${error.message}`);
+
+      const failure = new Error(error);
+
+      failure.httpStatusCode = 500;
+
+      return next(failure);
     }
   }
 };
@@ -197,6 +221,12 @@ const deleteProduct = async (request, response) => {
     response.redirect('/admin/products');
   } catch (error) {
     console.log(`Sorry, an error occurred while deleting product: ${error.message}`);
+
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
   }
 };
 
