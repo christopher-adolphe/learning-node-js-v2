@@ -3,6 +3,23 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
+
+/**
+ * Using the `diskStorage()` method from the
+ * `multer` instance to setup a storage engine
+ * The configuration of the storage engine take
+ * an object with 2 keys; a `destination` and
+ * `filename` for files which will be uploaded
+*/
+const fileStorage = multer.diskStorage({
+  destination: (request, file, doneCallback) => {
+    doneCallback(null, 'images');
+  },
+  filename: (request, file, doneCallback) => {
+    doneCallback(null, `${new Date().toISOString()}-${file.originalname}`);
+  },
+});
 
 const addLocals = require('./middleware/addLocals');
 
@@ -32,6 +49,14 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 app.use(express.urlencoded({ extended: true }));
+/**
+ * Using multer middleware to process files uploaded
+ * in multipart/form-data format
+*/
+app.use(multer({
+  storage: fileStorage,
+}).single('image'));
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret: 'my session secret',

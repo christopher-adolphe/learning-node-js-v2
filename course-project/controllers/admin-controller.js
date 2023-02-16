@@ -70,6 +70,9 @@ const addProduct = (request, response) => {
 
 const createProduct = async (request, response, next) => {
   const { title, imgUrl, description, price } = request.body;
+  const image = request.file;
+
+  console.log('image: ', image);
   const { user } = request;
   const errors = validationResult(request);
 
