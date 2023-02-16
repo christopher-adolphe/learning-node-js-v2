@@ -19,9 +19,14 @@
             <input type="text" id="title" name="title" value="<% if (isEditMode || hasError) { %><%= product.title %><% } %>" />
           </div>
   
-          <div class="form__group <%= errors.find(error => error.param === 'imgUrl') ? 'form__group--error' : '' %>">
+          <!-- <div class="form__group <%= errors.find(error => error.param === 'imgUrl') ? 'form__group--error' : '' %>">
             <label for="imgUrl">Product image</label>
             <input type="text" id="imgUrl" name="imgUrl" value="<% if (isEditMode || hasError) { %><%= product.imageUrl %><% } %>" />
+          </div> -->
+
+          <div class="form__group">
+            <label for="image">Product image</label>
+            <input type="file" id="image" name="image" />
           </div>
   
           <div class="form__group <%= errors.find(error => error.param === 'price') ? 'form__group--error' : '' %>">
