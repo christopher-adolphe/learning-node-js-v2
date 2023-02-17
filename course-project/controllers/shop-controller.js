@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 const Product = require('../models/product');
 const Order = require('../models/order');
 
@@ -183,6 +186,54 @@ const getOrders = async (request, response) => {
   }
 };
 
+const getOrderInvoice = async (request, response, next) => {
+  const user = request.user;
+  const orderId = request.params.orderId;
+  const invoiceFile = `invoice-${orderId}.pdf`;
+  /*
+  * Using Node.js `path` module to contruct the
+  * to the invoice file
+  */
+  const invoicePath = path.join('data', 'invoices', invoiceFile);
+
+  try {
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return next(new Error(`Sorry, no order found with id: ${orderId}`));
+    }
+
+    if (order.userId.toString() !== user._id.toString()) {
+      return next(new Error(`Sorry, you are not authorized to view order with id: ${orderId}`));
+    }
+
+    /*
+    * Using Node.js `fs` module to read the invoice
+    * file from the path we constructed above
+    */
+    fs.readFile(invoicePath, (error, data) => {
+      if (error) {
+        return next(error);
+      }
+
+      response.setHeader('Content-Type', 'application/pdf');
+      /**
+       * If we set the response header `Content-Disposition` to
+       * `attachment`, the user will be prompted to choose a
+       * destination folder to save he/she wants to download
+       * If set to `inline`, the file will open in the browser
+       * itself
+      */
+      // response.setHeader('Content-Disposition', `attachment; filename=${invoiceFile}`);
+      response.setHeader('Content-Disposition', `inline; filename=${invoiceFile}`);
+
+      response.send(data);
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getCheckout = (request, response) => {
   response.render('shop/checkout', {
     pageTitle: 'Checkout',
@@ -198,6 +249,7 @@ module.exports = {
   postCart,
   postOrder,
   getOrders,
+  getOrderInvoice,
   getCheckout,
   deleteCartItem
 };
