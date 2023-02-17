@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const PDFDocument = require('pdfkit');
 
 const Product = require('../models/product');
 const Order = require('../models/order');
@@ -207,28 +208,69 @@ const getOrderInvoice = async (request, response, next) => {
       return next(new Error(`Sorry, you are not authorized to view order with id: ${orderId}`));
     }
 
+    const pdfDoc = new PDFDocument();
+
     /*
     * Using Node.js `fs` module to read the invoice
     * file from the path we constructed above
+    * This method is not suitable for large files
     */
-    fs.readFile(invoicePath, (error, data) => {
-      if (error) {
-        return next(error);
-      }
+    // fs.readFile(invoicePath, (error, data) => {
+    //   if (error) {
+    //     return next(error);
+    //   }
 
-      response.setHeader('Content-Type', 'application/pdf');
-      /**
-       * If we set the response header `Content-Disposition` to
-       * `attachment`, the user will be prompted to choose a
-       * destination folder to save he/she wants to download
-       * If set to `inline`, the file will open in the browser
-       * itself
-      */
-      // response.setHeader('Content-Disposition', `attachment; filename=${invoiceFile}`);
-      response.setHeader('Content-Disposition', `inline; filename=${invoiceFile}`);
+    //   response.setHeader('Content-Type', 'application/pdf');
+    //   /**
+    //    * If we set the response header `Content-Disposition` to
+    //    * `attachment`, the user will be prompted to choose a
+    //    * destination folder to save he/she wants to download
+    //    * If set to `inline`, the file will open in the browser
+    //    * itself
+    //   */
+    //   // response.setHeader('Content-Disposition', `attachment; filename=${invoiceFile}`);
+    //   response.setHeader('Content-Disposition', `inline; filename=${invoiceFile}`);
 
-      response.send(data);
+    //   response.send(data);
+    // });
+
+    /**
+     * For large files, a streamed response is better as
+     * this will allow Node.js to read the file in chunks
+    */
+    // const data = fs.createReadStream(invoicePath);
+
+    response.setHeader('Content-Type', 'application/pdf');
+    response.setHeader('Content-Disposition', `inline; filename=${invoiceFile}`);
+
+    /**
+     * Using the `pipe()` method on the response object to
+     * pipe the readable stream of data into the response's
+     * writable stream
+    */
+    // response.pipe(data);
+
+    pdfDoc.pipe(fs.createWriteStream(invoicePath));
+    pdfDoc.pipe(response);
+
+    pdfDoc
+      .fontSize(28)
+      .text('Invoice', { underline: true });
+
+    pdfDoc
+      .text('-----------------------------');
+
+    let totalPrice = 0;
+
+    order.items.forEach((item, index) => {
+      totalPrice = (totalPrice + item.quantity) * item.product.price;
+
+      pdfDoc
+        .fontSize(14)
+        .text(`${index + 1}: ${item.product.title} - ${item.quantity} - $${item.product.price}`);
     });
+
+    pdfDoc.end();
   } catch (error) {
     next(error);
   }

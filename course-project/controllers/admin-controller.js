@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator/check');
+const deleteFile = require('../utils/file');
 
 const Product = require('../models/product');
 
@@ -215,6 +216,7 @@ const updateProduct = async (request, response) => {
        * that was uploaded when the product was created
       */
       if (image) {
+        deleteFile(image.path);
         productToUpdate.imageUrl = image.path;
       }
 
@@ -252,6 +254,14 @@ const deleteProduct = async (request, response) => {
      * product so that we can authorize if the user
      * is allow to delete the product
     */
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return next(new Error(`Sorry, an error occurred while deleting product.`));
+    }
+
+    deleteFile(product.imageUrl);
+
     const deletedProduct = await Product.deleteOne({ _id: productId, userId: user._id });
 
     response.redirect('/admin/products');

@@ -12,12 +12,12 @@
           <ul>
             <% orders.forEach(order => { %>
               <li>
-                <h4>Order ID: (<%= order._id %>)</h4>
+                <h4>Order ID: (<%= order._id %>) - <a href="/orders/<%= order._id %>">Invoice</a></h4>
 
                 <ul>
                   <% order.items.forEach(item => { %>
                     <li>
-                      <%= item.product.title %> (<%= item.quantity %>) - <a href="/orders/<%= order._id %>">Invoice</a>
+                      <%= item.product.title %> (<%= item.quantity %>)
                     </li>
                   <% }) %>
                 </ul>
