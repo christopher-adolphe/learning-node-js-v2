@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator/check');
+const deleteFile = require('../utils/file');
 
 const Product = require('../models/product');
 
@@ -69,9 +70,33 @@ const addProduct = (request, response) => {
 };
 
 const createProduct = async (request, response, next) => {
-  const { title, imgUrl, description, price } = request.body;
+  const { title, description, price } = request.body;
+
+  /**
+   * Accessing the `file` property on the `request` object
+   * to get the uploaded file. The `multer` middleware would
+   * set it to an object containing details about the file
+   * that was uploaded like filename, mimetype, path etc
+  */
+  const image = request.file;
+
+  // console.log('image: ', image);
   const { user } = request;
   const errors = validationResult(request);
+
+  console.log('errors: ', errors);
+
+  if (!image) {
+    return response.status(422).render('admin/edit-product', {
+      pageTitle: 'Add Product',
+      slug: 'add-product',
+      isEditMode: false,
+      hasError: true,
+      errorMessage: 'Sorry, the file uploaded was not an image',
+      product: { title, description, price },
+      errors: [],
+    });
+  }
 
   if (!errors.isEmpty()) {
     return response.status(422).render('admin/edit-product', {
@@ -80,18 +105,18 @@ const createProduct = async (request, response, next) => {
       isEditMode: false,
       hasError: true,
       errorMessage: errors.array()[0].msg,
-      product: { title, imgUrl, description, price },
+      product: { title, description, price },
       errors: errors.array(),
     });
   }
 
-  if (title.trim() !== '' || imgUrl.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
+  if (title.trim() !== '' || description.trim() !== '' || price.trim() !== '') {
     try {
       const product = new Product({
         title,
         description,
         price, 
-        imageUrl: imgUrl,
+        imageUrl: image.path,
         userId: user,
       });
       
@@ -161,7 +186,8 @@ const editProduct = async (request, response) => {
 };
 
 const updateProduct = async (request, response) => {
-  const { productId, title, imgUrl, description, price } = request.body;
+  const { productId, title, description, price } = request.body;
+  const image = request.file;
   const errors = validationResult(request);
 
   if (!errors.isEmpty()) {
@@ -171,7 +197,7 @@ const updateProduct = async (request, response) => {
       isEditMode: true,
       hasError: true,
       errorMessage: errors.array()[0].msg,
-      product: { _id: productId, title, imageUrl: imgUrl, description, price },
+      product: { _id: productId, title, description, price },
       errors: errors.array(),
     });
   }
@@ -181,7 +207,19 @@ const updateProduct = async (request, response) => {
       const productToUpdate = await Product.findById(productId);
 
       productToUpdate.title = title;
-      productToUpdate.imageUrl = imgUrl;
+
+      /**
+       * Conditionally updating the `imageUrl` only
+       * if a new image file was uploaded on the edit
+       * product form. If `image` is not set then it
+       * will mean we are keeping the previous image
+       * that was uploaded when the product was created
+      */
+      if (image) {
+        deleteFile(image.path);
+        productToUpdate.imageUrl = image.path;
+      }
+
       productToUpdate.price = price;
       productToUpdate.description = description;
 
@@ -216,6 +254,14 @@ const deleteProduct = async (request, response) => {
      * product so that we can authorize if the user
      * is allow to delete the product
     */
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return next(new Error(`Sorry, an error occurred while deleting product.`));
+    }
+
+    deleteFile(product.imageUrl);
+
     const deletedProduct = await Product.deleteOne({ _id: productId, userId: user._id });
 
     response.redirect('/admin/products');

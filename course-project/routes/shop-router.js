@@ -11,6 +11,7 @@ const {
   deleteCartItem,
   postOrder,
   getOrders,
+  getOrderInvoice,
   getCheckout
 } = require('../controllers/shop-controller');
 
@@ -29,6 +30,8 @@ router.post('/cart-delete-item', authentication, deleteCartItem);
 router.post('/add-order', authentication, postOrder);
 
 router.get('/orders', authentication, getOrders);
+
+router.get('/orders/:orderId', authentication, getOrderInvoice);
 
 // router.get('/checkout', getCheckout);
 

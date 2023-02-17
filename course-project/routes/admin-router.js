@@ -28,16 +28,11 @@ router.post(
       .isLength({ min: 3 })
       .withMessage('Sorry, product title should be at least 3 charactors long!')
       .trim(),
-    body('imgUrl')
-      .isURL()
-      .withMessage('Sorry, please provide a valid url for the prodoct image!')
-      .trim(),
     body('price')
       .isFloat()
       .withMessage('Sorry, please provide a valid price for the prodoct!')
       .trim(),
     body('description')
-      .isAlphanumeric()
       .isLength({ min: 5, max: 200 })
       .withMessage('Sorry, product description should be at least 5 charactors long!')
       .trim(),
@@ -56,16 +51,11 @@ router.post(
       .isLength({ min: 3 })
       .withMessage('Sorry, product title should be at least 3 charactors long!')
       .trim(),
-    body('imgUrl')
-      .isURL()
-      .withMessage('Sorry, please provide a valid url for the prodoct image!')
-      .trim(),
     body('price')
       .isFloat()
       .withMessage('Sorry, please provide a valid price for the prodoct!')
       .trim(),
     body('description')
-      .isAlphanumeric()
       .isLength({ min: 5, max: 200 })
       .withMessage('Sorry, product description should be at least 5 charactors long!')
       .trim(),
