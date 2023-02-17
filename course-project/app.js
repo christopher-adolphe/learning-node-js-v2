@@ -8,7 +8,7 @@ const multer = require('multer');
 /**
  * Using the `diskStorage()` method from the
  * `multer` instance to setup a storage engine
- * The configuration of the storage engine take
+ * The configuration of the storage engine takes
  * an object with 2 keys; a `destination` and
  * `filename` for files which will be uploaded
 */
@@ -20,6 +20,24 @@ const fileStorage = multer.diskStorage({
     doneCallback(null, `${new Date().toISOString()}-${file.originalname}`);
   },
 });
+
+/**
+ * Configuring a file filter for `multer` to
+ * apply when files are uploaded so that we
+ * can accept which file type can or cannot
+ * be uploaded
+*/
+const fileFilter = (request, file, doneCallback) => {
+  const allowedFileTypes = ['image/png', 'image/jpg', 'image/jpeg'];
+
+  if (allowedFileTypes.includes(file.mimetype)) {
+    // Calling the `doneCallback` with true to accept uploaded file
+    doneCallback(null, true);
+  } else {
+    // Calling the `doneCallback` with true to reject uploaded file
+    doneCallback(null, false);
+  }
+};
 
 const addLocals = require('./middleware/addLocals');
 
@@ -55,9 +73,16 @@ app.use(express.urlencoded({ extended: true }));
 */
 app.use(multer({
   storage: fileStorage,
+  fileFilter,
 }).single('image'));
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+/**
+ * Serving the uploaded file statically
+*/
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 app.use(session({
   secret: 'my session secret',
   resave: false,
