@@ -174,3 +174,29 @@ body {
 .product__description {
   flex: 1;
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.pagination__link {
+  width: 3.125rem;
+  height: 3.125rem;
+  margin: 0.5rem;
+  background-color: #3498db;
+  color: #EFEFEF;
+  border-radius: 50%;
+  line-height: 3.125rem;
+  text-align: center;
+  text-decoration: none;
+}
+
+.pagination__link:hover,
+.pagination__link:focus,
+.pagination__link:active,
+.pagination__link--active {
+  background-color: #e74c3c;
+}

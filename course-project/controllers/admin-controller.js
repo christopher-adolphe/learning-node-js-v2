@@ -3,11 +3,15 @@ const deleteFile = require('../utils/file');
 
 const Product = require('../models/product');
 
+const ITEMS_PER_PAGE = 2;
+
 const getProducts = async (request, response) => {
+  const page = +request.query.page || 1;
   const { user } = request;
   let products = [];
 
   try {
+    const productCount = await Product.find().countDocuments();
     /**
      * Querying for products by filtering them by
      * user id so that the user only views products
@@ -15,7 +19,10 @@ const getProducts = async (request, response) => {
      * is only authorized to view products he/she
      * created
     */
-    products = await Product.find({ userId: user._id });
+    products = await Product
+      .find({ userId: user._id })
+      .skip((page - 1) * ITEMS_PER_PAGE)
+      .limit(ITEMS_PER_PAGE);
       /**
        * Using the `select()` method to specify which document fields
        * to include or exclude. Exclusion is denoted by prefixing the 
@@ -35,6 +42,12 @@ const getProducts = async (request, response) => {
       slug: 'view-products',
       hasProducts: products.length,
       products,
+      hasNextPage: (ITEMS_PER_PAGE * +page) < productCount,
+      hasPrevPage: page > 1,
+      currPage: page,
+      nextPage: page + 1,
+      prevPage: page - 1,
+      lastPage: Math.ceil(productCount / ITEMS_PER_PAGE),
     });
   } catch (error) {
     console.log(`Sorry, an error occurred while fetching products: ${error.message}`);

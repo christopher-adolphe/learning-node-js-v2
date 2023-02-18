@@ -5,6 +5,8 @@ const PDFDocument = require('pdfkit');
 const Product = require('../models/product');
 const Order = require('../models/order');
 
+const ITEMS_PER_PAGE = 1;
+
 const getShop = (request, response) => {
   response.render('shop/index', {
     pageTitle: 'Welcome',
@@ -13,16 +15,28 @@ const getShop = (request, response) => {
 };
 
 const getProductList = async (request, response) => {
+  const page = +request.query.page || 1;
   let products = [];
   
   try {
-    products = await Product.find();
+    const productCount = await Product.find().countDocuments();
+
+    products = await Product
+      .find()
+      .skip((page - 1) * ITEMS_PER_PAGE)
+      .limit(ITEMS_PER_PAGE);
 
     response.render('shop/product-list', {
       pageTitle: 'Product List',
       slug: 'products',
       hasProducts: products.length,
       products,
+      hasNextPage: (ITEMS_PER_PAGE * +page) < productCount,
+      hasPrevPage: page > 1,
+      currPage: page,
+      nextPage: page + 1,
+      prevPage: page - 1,
+      lastPage: Math.ceil(productCount / ITEMS_PER_PAGE),
     });
   } catch (error) {
     console.log(`Sorry, an error occurred while fetching products: ${error.message}`);

@@ -1,0 +1,19 @@
+<div class="pagination">
+  <% if (currPage !== 1 && prevPage !== 1) { %>
+    <a class="pagination__link" href="?page=1">1</a>
+  <% } %>
+
+  <% if (hasPrevPage) { %>
+    <a class="pagination__link" href="?page=<%= prevPage %>"><%= prevPage %></a>
+  <% } %>
+
+  <a class="pagination__link pagination__link--active" href="?page=<%= currPage %>"><%= currPage %></a>
+
+  <% if (hasNextPage) { %>
+    <a class="pagination__link" href="?page=<%= nextPage %>"><%= nextPage %></a>
+  <% } %>
+
+  <% if (lastPage !== currPage && nextPage !== lastPage) { %>
+    <a class="pagination__link" href="?page=<%= lastPage %>"><%= lastPage %></a>
+  <% } %>
+</div>
