@@ -19,8 +19,18 @@ const getProductList = async (request, response) => {
   let products = [];
   
   try {
+    /**
+     * Using the `countDocuments()` method to get the
+     * total number of product documents
+    */
     const productCount = await Product.find().countDocuments();
 
+    /**
+     * Using the `skip()` method to offset the documents
+     * per the number of items we want to display on a page
+     * Using the `limit()` method to fetch only the specified
+     * number of documents
+    */
     products = await Product
       .find()
       .skip((page - 1) * ITEMS_PER_PAGE)
