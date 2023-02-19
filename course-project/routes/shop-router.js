@@ -33,6 +33,6 @@ router.get('/orders', authentication, getOrders);
 
 router.get('/orders/:orderId', authentication, getOrderInvoice);
 
-// router.get('/checkout', getCheckout);
+router.get('/checkout', authentication, getCheckout);
 
 module.exports = router;

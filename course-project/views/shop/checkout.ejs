@@ -6,7 +6,40 @@
 
     <main class="app__main">
       <div class="container">
-        <h1>Shop checkout page</h1>
+        <h1><%= pageTitle %></h1>
+
+        <% if (cartItems.length) { %>
+          <ul>
+            <% cartItems.forEach(product => { %>
+              <li>
+                <p><%= product.productId.title %> (<%= product.quantity %>)</p>
+              </li>
+            <% }) %>
+          </ul>
+
+          <hr />
+
+          <h2><strong>Cart Total: $<%= cartTotal %></strong></h2>
+
+          <div>
+            <button type="button" id="order-btn" class="btn btn-edit btn-centered">Order !</button>
+            <script src="https://js.stripe.com/v3/"></script>
+            <script>
+              const stripe = Stripe('YOUR_SECRET_STRIPE_TEST_KEY');
+              const orderBtn = document.getElementById('order-btn');
+
+              orderBtn.addEventListener('click', () => {
+                console.log('Stripe: ', { stripe, orderBtn });
+
+                stripe.redirectToCheckout({
+                  sessionId: '<%= sessionId %>',
+                });
+              });
+            </script>
+          </div>
+        <% } else { %>
+          <p>Sorry, your cart is currently empty so there's nothing to checkout.</p>
+        <% } %>
       </div>
     </main>
   </div>
