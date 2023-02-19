@@ -30,8 +30,8 @@
                     </form> -->
 
                     <!-- Implement the delete product feature using async requests approach -->
-                    <form>
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <form class="delete-product-form">
+                      <input type="hidden" id="csrfToken" name="_csrf" value="<%= csrfToken %>" />
                       <input type="hidden" id="productId" name="productId" value="<%= product._id %>" />
                       <button type="button" class="btn btn-delete">Delete</button>
                     </form>

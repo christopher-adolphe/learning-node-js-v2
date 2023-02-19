@@ -12,6 +12,7 @@ const {
   editProduct,
   updateProduct,
   deleteProduct,
+  asyncDeleteProduct,
 } = require('../controllers/admin-controller');
 
 router.get('/products', authentication, getProducts);
@@ -65,5 +66,16 @@ router.post(
 );
 
 router.post('/delete-product', authentication, deleteProduct);
+
+/**
+ * Using the async request approach to delete
+ * a product. Async request have access to a
+ * `delete` HTTP method because the request is
+ * sent via client-side JavaScript
+ * NOTE: When HTTP requests are sent from forms
+ * and links, the browser only supports `get` and
+ * `post` methods
+*/
+router.delete('/products/:productId', authentication, asyncDeleteProduct);
 
 module.exports = router;

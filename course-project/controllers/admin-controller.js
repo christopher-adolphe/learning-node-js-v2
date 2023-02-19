@@ -289,6 +289,42 @@ const deleteProduct = async (request, response) => {
   }
 };
 
+const asyncDeleteProduct = async (request, response) => {
+  const { productId } = request.params;
+  const { user } = request;
+
+  try {
+    /**
+     * Using the `findByIdAndRemove()` method to delete a
+     * product by filtering with a given `_id`
+    */
+    // const deletedProduct = await Product.findByIdAndRemove(productId);
+
+    /**
+     * Using the `deleteOne()` method to delete a
+     * product so that we can authorize if the user
+     * is allow to delete the product
+    */
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return next(new Error(`Sorry, an error occurred while deleting product with id: ${productId}`));
+    }
+
+    deleteFile(product.imageUrl);
+
+    await Product.deleteOne({ _id: productId, userId: user._id });
+
+    response.status(200).json({ message: `Successfully deleted product with id: ${productId}` });
+  } catch (error) {
+    console.log(`Sorry, an error occurred while deleting product: ${error.message}`);
+
+    const failure = new Error(error);
+
+    response.status(500).json({ message: failure.message });
+  }
+};
+
 module.exports = {
   getProducts,
   getProduct,
@@ -297,4 +333,5 @@ module.exports = {
   editProduct,
   updateProduct,
   deleteProduct,
+  asyncDeleteProduct,
 };
