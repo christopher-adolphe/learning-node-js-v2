@@ -25,12 +25,10 @@
             <button type="button" id="order-btn" class="btn btn-edit btn-centered">Order !</button>
             <script src="https://js.stripe.com/v3/"></script>
             <script>
-              const stripe = Stripe('YOUR_SECRET_STRIPE_TEST_KEY');
+              const stripe = Stripe('YOUR_STRIPE_PUBLISHABLE_KEY');
               const orderBtn = document.getElementById('order-btn');
 
               orderBtn.addEventListener('click', () => {
-                console.log('Stripe: ', { stripe, orderBtn });
-
                 stripe.redirectToCheckout({
                   sessionId: '<%= sessionId %>',
                 });

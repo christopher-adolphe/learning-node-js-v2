@@ -12,7 +12,8 @@ const {
   postOrder,
   getOrders,
   getOrderInvoice,
-  getCheckout
+  getCheckout,
+  getCheckoutSuccess
 } = require('../controllers/shop-controller');
 
 router.get('/', getShop);
@@ -34,5 +35,9 @@ router.get('/orders', authentication, getOrders);
 router.get('/orders/:orderId', authentication, getOrderInvoice);
 
 router.get('/checkout', authentication, getCheckout);
+
+router.get('/checkout/success', authentication, getCheckoutSuccess);
+
+router.get('/checkout/cancel', authentication, getCheckout);
 
 module.exports = router;

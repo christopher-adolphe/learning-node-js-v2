@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const PDFDocument = require('pdfkit');
-const stripe = require('stripe')('YOUR_SECRET_STRIPE_KEY');
+const stripe = require('stripe')('YOUR_STRIPE_SECRET_KEY');
 
 const Product = require('../models/product');
 const Order = require('../models/order');
@@ -324,14 +324,19 @@ const getCheckout = async (request, response) => {
     const stripeSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: cartItems.map(item => ({
-        name: item.productId.title,
-        description: item.productId.description,
-        amount: item.productId.price * 100,
-        currency: 'usd',
+        price_data: {
+          currency: 'usd',
+          unit_amount: item.productId.price * 100,
+          product_data: {
+            name: item.productId.title,
+            description: item.productId.description,
+          },
+        },
         quantity: item.quantity,
       })),
-      success_ur: `${request.protocal}://${request.get('host')}/checkout/success`,
-      cancel_url: `${request.protocal}://${request.get('host')}/checkout/cancel`,
+      mode: 'payment',
+      success_url: `${request.protocol}://${request.get('host')}/checkout/success`,
+      cancel_url: `${request.protocol}://${request.get('host')}/checkout/cancel`,
     });
 
     response.render('shop/checkout', {
@@ -355,6 +360,40 @@ const getCheckout = async (request, response) => {
   }
 };
 
+const getCheckoutSuccess = async (request, response) => {
+  const { user } = request;
+
+  try {
+    const userCart = await user.populate('cart.productId');
+    const order = new Order({
+      items: userCart.cart.map(cartItem => ({
+        /**
+         * Using the `_doc` property to extract all the
+         * fields for product from the `productId` field
+         * stored in the `cart` field of the `User` model
+        */
+        product: { ...cartItem.productId._doc },
+        quantity: cartItem.quantity,
+      })),
+      userId: user._id,
+    });
+
+    await order.save();
+    await user.clearCart();
+
+    response.redirect('/orders');
+  } catch (error) {
+    console.log(`Sorry, an error occurred while creating order: ${error.message}`);
+
+    // response.redirect('/cart');
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
+  }
+};
+
 module.exports = {
   getShop,
   getProductList,
@@ -365,5 +404,6 @@ module.exports = {
   getOrders,
   getOrderInvoice,
   getCheckout,
-  deleteCartItem
+  getCheckoutSuccess,
+  deleteCartItem,
 };
