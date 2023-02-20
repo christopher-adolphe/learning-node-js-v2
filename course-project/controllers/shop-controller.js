@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const PDFDocument = require('pdfkit');
+const stripe = require('stripe')('YOUR_STRIPE_SECRET_KEY');
 
 const Product = require('../models/product');
 const Order = require('../models/order');
@@ -92,6 +93,13 @@ const getCart = async (request, response) => {
   let cartItems = [];
 
   try {
+    /**
+     * Using the `populate()` method from mongoDB to
+     * pull product details into the user. Behind the
+     * scenes mongoDB will fetch details for the supplied
+     * `productId` and `populate` these details under
+     * the `productId` field of the `user` model
+    */
     const userCart = await user.populate('cart.productId');
     
     cartItems = userCart.cart;
@@ -300,11 +308,90 @@ const getOrderInvoice = async (request, response, next) => {
   }
 };
 
-const getCheckout = (request, response) => {
-  response.render('shop/checkout', {
-    pageTitle: 'Checkout',
-    slug: 'checkout',
-  });
+const getCheckout = async (request, response) => {
+  const { user } = request;
+  let cartItems = [];
+  let cartTotal = 0;
+
+  try {
+    const userCart = await user.populate('cart.productId');
+    
+    cartItems = userCart.cart;
+    cartItems.forEach(item => {
+      cartTotal += item.productId.price * item.quantity;
+    });
+
+    const stripeSession = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: cartItems.map(item => ({
+        price_data: {
+          currency: 'usd',
+          unit_amount: item.productId.price * 100,
+          product_data: {
+            name: item.productId.title,
+            description: item.productId.description,
+          },
+        },
+        quantity: item.quantity,
+      })),
+      mode: 'payment',
+      success_url: `${request.protocol}://${request.get('host')}/checkout/success`,
+      cancel_url: `${request.protocol}://${request.get('host')}/checkout/cancel`,
+    });
+
+    response.render('shop/checkout', {
+      pageTitle: 'Checkout',
+      slug: 'checkout',
+      cartItems,
+      cartTotal,
+      sessionId: stripeSession.id,
+    });
+  } catch (error) {
+    console.log(`Sorry, an error occurred while fetching cart: ${error.message}`);
+
+    response
+      .status(500)
+      .render('shop/checkout', {
+        pageTitle: 'Checkout',
+        slug: 'checkout',
+        cartItems,
+        cartTotal
+      });
+  }
+};
+
+const getCheckoutSuccess = async (request, response) => {
+  const { user } = request;
+
+  try {
+    const userCart = await user.populate('cart.productId');
+    const order = new Order({
+      items: userCart.cart.map(cartItem => ({
+        /**
+         * Using the `_doc` property to extract all the
+         * fields for product from the `productId` field
+         * stored in the `cart` field of the `User` model
+        */
+        product: { ...cartItem.productId._doc },
+        quantity: cartItem.quantity,
+      })),
+      userId: user._id,
+    });
+
+    await order.save();
+    await user.clearCart();
+
+    response.redirect('/orders');
+  } catch (error) {
+    console.log(`Sorry, an error occurred while creating order: ${error.message}`);
+
+    // response.redirect('/cart');
+    const failure = new Error(error);
+
+    failure.httpStatusCode = 500;
+
+    return next(failure);
+  }
 };
 
 module.exports = {
@@ -317,5 +404,6 @@ module.exports = {
   getOrders,
   getOrderInvoice,
   getCheckout,
-  deleteCartItem
+  getCheckoutSuccess,
+  deleteCartItem,
 };

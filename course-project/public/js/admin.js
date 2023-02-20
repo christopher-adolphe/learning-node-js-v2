@@ -4,9 +4,6 @@ formElems.forEach(deleteProductForm => {
   const csrfToken = deleteProductForm.querySelector('[name=_csrf]').value;
   const productId = deleteProductForm.querySelector('[name=productId]').value;
   const deleteBtn = deleteProductForm.querySelector('.btn-delete');
-  // const productItemElem = deleteProductForm.closest('.product-item');
-
-  // console.log('productItemElem: ', productItemElem);
 
   deleteBtn.addEventListener('click', async (event) => {
     const productItemElem = event.target.closest('.product-item');

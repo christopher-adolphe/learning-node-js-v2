@@ -6,7 +6,7 @@
 
     <main class="app__main">
       <div class="container">
-        <h1>Shopping cart</h1>
+        <h1><%= pageTitle %></h1>
 
         <% if (cartItems.length) { %>
           <ul>
@@ -25,10 +25,11 @@
 
           <hr />
 
-          <form action="/add-order" method="POST">
+          <!-- <form action="/add-order" method="POST">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <button type="submit" class="btn btn-edit btn-centered">Order Now!</button>
-          </form>
+          </form> -->
+          <a href="/checkout" class="btn btn-edit btn-centered">Checkout</a>
         <% } else { %>
           <p>Sorry, your cart is currently empty.</p>
         <% } %>
