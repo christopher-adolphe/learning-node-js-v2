@@ -1,72 +1,92 @@
-let posts = [
-  {
-    _id: '1',
-    title: 'The First Post',
-    content: 'This is the first post content.',
-    imageUrl: 'images/react-logo.png',
-    creator: {
-      name: 'Jane Doe',
-    },
-    createdAt: new Date(),
-  },
-  {
-    _id: '2',
-    title: 'The Second Post',
-    content: 'This is the second post content.',
-    imageUrl: 'images/react-logo.png',
-    creator: {
-      name: 'Greg Lutzska',
-    },
-    createdAt: new Date(),
-  },
-  {
-    _id: '3',
-    title: 'The Third Post',
-    content: 'This is the third post content.',
-    imageUrl: 'images/react-logo.png',
-    creator: {
-      name: 'Rachel Robins',
-    },
-    createdAt: new Date(),
-  },
-];
+const Post = require('../models/post');
+const { validationResult } = require('express-validator');
 
-const getPosts = (request, response, next) => {
-  response.status(200).json(
-    {
-      posts,
+const getPosts = async (request, response, next) => {
+  try {
+    const posts = await Post.find();
+
+    response.status(200).json(
+      {
+        posts,
+      }
+    )
+  } catch (error) {
+    // console.log(`Sorry, an error occurred while fetching posts: ${error.message}`);
+    if (!error.statusCode) {
+      error.statusCode = 500;
     }
-  )
+
+    next(error);
+  }
 };
 
-const getPost = (request, response, next) => {
+const getPost = async (request, response, next) => {
   const { id } = request.params;
 
-  const post = posts.find(post => post._id === id);
+  try {
+    const post = await Post.findById(id);
 
-  response.status(200).json({ post });
+    if (!post) {
+      const error = new Error(`Sorry, no post found with id: ${id}`);
+
+      error.statusCode = 404;
+
+      return next(error);
+    }
+
+    response.status(200).json({ post });
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+
+    next(error);
+  }
 };
 
-const createPost = (request, response, next) => {
+const createPost = async (request, response, next) => {
+  const errors = validationResult(request);
   const { title, content } = request.body;
 
-  const post = {
-    _id: `${posts.length + 1}`,
-    title,
-    content,
-    imageUrl: 'images/react-logo.png',
-    creator: {
-      name: 'Rachel Robins',
-    },
-    createdAt: new Date(),
-  };
+  if (!errors.isEmpty()) {
+    const error = new Error('Sorry, an error occurred while creating new post because the request is invalid.');
 
-  posts.push(post);
+    error.statusCode = 422;
+    
+    return next(error);
+  }
 
-  response.status(201).json({
-    message: 'New post successfully created',
-    post,
-  })
+  if (!request.file) {
+    const error = new Error('Sorry, an error occurred while creating new post because no image was uploaded.');
+
+    error.statusCode = 422;
+    
+    return next(error);
+  }
+
+  try {
+    const post = new Post({
+      title,
+      content,
+      imageUrl: request.file.path,
+      creator: {
+        name: 'Rachel Robins',
+      },
+    });
+
+    const result = await post.save();
+
+    response.status(201).json({
+      message: 'New post successfully created',
+      post: result,
+    });
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+
+    next(error);
+  }
 };
 
 const deletePost = (request, response, next) => {

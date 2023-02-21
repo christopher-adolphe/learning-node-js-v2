@@ -70,6 +70,8 @@ app.use(express.urlencoded({ extended: true }));
 /**
  * Using multer middleware to process files uploaded
  * in multipart/form-data format
+ * NOTE: The field in which the image is uploaded is
+ * specified in the `single()` function
 */
 app.use(multer({
   storage: fileStorage,
