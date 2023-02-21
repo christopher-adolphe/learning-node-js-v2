@@ -1,7 +1,13 @@
 const express = require('express');
 const { body } = require('express-validator');
 
-const { getPosts, getPost, createPost, deletePost } = require('../controllers/feed-controller');
+const {
+  getPosts,
+  getPost,
+  createPost,
+  updatePost,
+  deletePost
+} = require('../controllers/feed-controller');
 
 const router = express.Router();
 
@@ -16,6 +22,15 @@ router.post(
     body('content').trim().isLength({ min: 5}),
   ],
   createPost
+);
+
+router.put(
+  '/posts/:id',
+  [
+    body('title').trim().isLength({ min: 5 }),
+    body('content').trim().isLength({ min: 5}),
+  ],
+  updatePost
 );
 
 router.delete('/posts/:id', deletePost);
