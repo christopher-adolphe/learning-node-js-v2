@@ -4,12 +4,20 @@ const Post = require('../models/post');
 const { validationResult } = require('express-validator');
 
 const getPosts = async (request, response, next) => {
+  const currentPage = request.query.page || 1;
+  const postPerPage = 2;
+
   try {
-    const posts = await Post.find();
+    const postCount = await Post.find().countDocuments();
+    const posts = await Post
+      .find()
+      .skip((currentPage - 1) * postPerPage)
+      .limit(postPerPage);
 
     response.status(200).json(
       {
         posts,
+        totalItems: postCount,
       }
     )
   } catch (error) {
@@ -93,7 +101,7 @@ const createPost = async (request, response, next) => {
 
 const updatePost = async (request, response, next) => {
   const errors = validationResult(request);
-  const { title, content, image } = request.body;
+  let { title, content, image } = request.body;
   const uploadedImage =  request.file;
   const { id } = request.params;
 
@@ -162,16 +170,45 @@ const updatePost = async (request, response, next) => {
   }
 };
 
-const deletePost = (request, response, next) => {
+const deletePost = async (request, response, next) => {
   const { id } = request.params;
 
-  const post = posts.find(post => post._id === id);
-  posts = posts.filter(post => post._id !== id);
+  try {
+    const post = await Post.findById(id);
 
-  response.status(200).json({
-    message: `Post with id: ${id} successfully deleted`,
-    post,
-  })
+    if (!post) {
+      const error = new Error(`Sorry, no post found with id: ${id}`);
+
+      error.statusCode = 404;
+
+      return next(error);
+    }
+
+    const filePath = path.join(__dirname, '..', post.imageUrl);
+
+    fs.unlink(filePath, error => {
+      if (error) {
+        const error = new Error('Sorry, an error occurred while deleting image post.');
+
+        error.statusCode = 500;
+        
+        return next(error);
+      }
+    });
+
+    const result = await Post.deleteOne({ _id: id });
+
+    response.status(200).json({
+      message: `Post with id: ${id} successfully deleted`,
+      post: result,
+    });
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+
+    next(error);
+  }
 };
 
 module.exports = {

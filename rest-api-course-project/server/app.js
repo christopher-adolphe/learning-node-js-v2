@@ -6,6 +6,7 @@ const multer = require('multer');
 const mongooseConnect = require('./utils/database');
 
 const feedRoutes = require('./routes/feed-routes');
+const authRoutes = require('./routes/auth-routes');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -79,6 +80,7 @@ app.use((request, response, next) => {
 });
 
 app.use('/feed', feedRoutes);
+app.use('/auth', authRoutes);
 
 /**
  * Setting up a catch all error middleware
