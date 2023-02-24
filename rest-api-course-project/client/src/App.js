@@ -81,7 +81,6 @@ class App extends Component {
         return res.json();
       })
       .then(resData => {
-        console.log(resData);
         this.setState({
           isAuth: true,
           token: resData.token,

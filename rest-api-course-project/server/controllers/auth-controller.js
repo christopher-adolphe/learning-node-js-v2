@@ -91,10 +91,77 @@ const signIn = async (request, response, next) => {
   }
 };
 
-const signOut = (request, response, next) => {};
+const getStatus = async (request, response, next) => {
+  const { userId } = request;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      const error = new Error(`Sorry, could not find user with id: ${userId}`);
+
+      error.statusCode = 404;
+
+      throw error;
+    }
+
+    return response.status(200).json({
+      status: user.status, 
+    });
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+
+    next(error);
+  }
+};
+
+const updateStatus = async (request, response, next) => {
+  const { userId } = request;
+  const { status } = request.body;
+  const errors = validationResult(request);
+
+  try {
+    if (!errors.isEmpty()) {
+      const error = new Error(`Sorry, status is invalid`);
+
+      error.statusCode = 422;
+      error.info = errors.array()[0];
+
+      throw error;
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      const error = new Error(`Sorry, could not find user with id: ${userId}`);
+
+      error.statusCode = 404;
+
+      throw error;
+    }
+
+    user.status = status;
+
+    const result = await user.save();
+
+    return response.status(200).json({
+      message: 'User status successfully updated',
+      userId: user._id,
+    });
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+
+    next(error);
+  }
+};
 
 module.exports = {
   signUp,
   signIn,
-  signOut,
+  getStatus,
+  updateStatus,
 };
