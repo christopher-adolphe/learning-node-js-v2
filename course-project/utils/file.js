@@ -5,7 +5,7 @@ const deleteFile = (filePath) => {
     if (error) {
       throw error;
     }
-  })
+  });
 };
 
 module.exports = deleteFile;
