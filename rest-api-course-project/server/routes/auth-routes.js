@@ -29,4 +29,6 @@ router.put(
   signUp
 );
 
+router.post('/signin', signIn);
+
 module.exports = router;

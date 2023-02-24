@@ -3,6 +3,7 @@ const path = require('path');
 const { validationResult } = require('express-validator');
 
 const Post = require('../models/post');
+const User = require('../models/user');
 
 const getPosts = async (request, response, next) => {
   const currentPage = request.query.page || 1;
@@ -42,7 +43,7 @@ const getPost = async (request, response, next) => {
 
       error.statusCode = 404;
 
-      return next(error);
+      throw error;
     }
 
     response.status(200).json({ post });
@@ -59,37 +60,54 @@ const createPost = async (request, response, next) => {
   const errors = validationResult(request);
   const { title, content } = request.body;
 
-  if (!errors.isEmpty()) {
-    const error = new Error('Sorry, an error occurred while creating new post because the request is invalid.');
-
-    error.statusCode = 422;
-    
-    return next(error);
-  }
-
-  if (!request.file) {
-    const error = new Error('Sorry, an error occurred while creating new post because no image was uploaded.');
-
-    error.statusCode = 422;
-    
-    return next(error);
-  }
-
   try {
+    if (!errors.isEmpty()) {
+      const error = new Error('Sorry, an error occurred while creating new post because the request is invalid.');
+  
+      error.statusCode = 422;
+      
+      throw error;
+    }
+  
+    if (!request.file) {
+      const error = new Error('Sorry, an error occurred while creating new post because no image was uploaded.');
+  
+      error.statusCode = 422;
+      
+      throw error;
+    }
+
     const post = new Post({
       title,
       content,
       imageUrl: request.file.path,
-      creator: {
-        name: 'Rachel Robins',
-      },
+      creator: request.userId,
     });
+
+    const user = await User.findById(request.userId);
+
+    /**
+     * Using the `push()` operator to append the
+     * `id` of the new post in the user before
+     * saving the new post to the database
+     * NOTE: We are passing the entire new `post`
+     * object to the `push()` operator but behind
+     * the scenes mongoose will take only the `_id`
+     * field as per the schema defined for the `User`
+     * model
+    */
+    user.posts.push(post);
+    await user.save();
 
     const result = await post.save();
 
     response.status(201).json({
       message: 'New post successfully created',
       post: result,
+      creator: {
+        _id: user._id,
+        name: user.name,
+      },
     });
   } catch (error) {
     if (!error.statusCode) {
@@ -106,27 +124,27 @@ const updatePost = async (request, response, next) => {
   const uploadedImage =  request.file;
   const { id } = request.params;
 
-  if (!errors.isEmpty()) {
-    const error = new Error('Sorry, an error occurred while updating post because the request is invalid.');
-
-    error.statusCode = 422;
-    
-    return next(error);
-  }
-
-  if (uploadedImage) {
-    image = uploadedImage.path;
-  }
-
-  if (!image) {
-    const error = new Error('Sorry, an error occurred while updating post because no image was uploaded.');
-
-    error.statusCode = 422;
-    
-    return next(error);
-  }
-
   try {
+    if (!errors.isEmpty()) {
+      const error = new Error('Sorry, an error occurred while updating post because the request is invalid.');
+  
+      error.statusCode = 422;
+      
+      throw error;
+    }
+  
+    if (uploadedImage) {
+      image = uploadedImage.path;
+    }
+  
+    if (!image) {
+      const error = new Error('Sorry, an error occurred while updating post because no image was uploaded.');
+  
+      error.statusCode = 422;
+      
+      throw error;
+    }
+
     const post = await Post.findById(id);
 
     if (!post) {
@@ -134,7 +152,15 @@ const updatePost = async (request, response, next) => {
 
       error.statusCode = 404;
 
-      return next(error);
+      throw error;
+    }
+
+    if (post.creator.toString() !== request.userId) {
+      const error = new Error(`Sorry, you are not authorized to update post with id: ${id}.`);
+
+      error.statusCode = 403;
+
+      throw error;
     }
 
     post.title = title;
@@ -173,6 +199,7 @@ const updatePost = async (request, response, next) => {
 
 const deletePost = async (request, response, next) => {
   const { id } = request.params;
+  const { userId } = request;
 
   try {
     const post = await Post.findById(id);
@@ -182,7 +209,15 @@ const deletePost = async (request, response, next) => {
 
       error.statusCode = 404;
 
-      return next(error);
+      throw error;
+    }
+
+    if (post.creator.toString() !== userId) {
+      const error = new Error(`Sorry, you are not authorized to delete post with id: ${id}.`);
+
+      error.statusCode = 403;
+
+      throw error;
     }
 
     const filePath = path.join(__dirname, '..', post.imageUrl);
@@ -198,6 +233,17 @@ const deletePost = async (request, response, next) => {
     });
 
     const result = await Post.deleteOne({ _id: id });
+    const user = await User.findById(userId);
+
+    /**
+     * Using the `pull()` operator to remove postIds from
+     * the user after the post is deleted. This is an
+     * important step to clear any relationship between
+     * the post being deleted and the user who created it
+    */
+    user.posts.pull(id);
+
+    await user.save();
 
     response.status(200).json({
       message: `Post with id: ${id} successfully deleted`,

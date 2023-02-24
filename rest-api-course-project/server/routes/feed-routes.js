@@ -1,6 +1,7 @@
 const express = require('express');
 const { body } = require('express-validator');
 
+const authenticate = require('../middleware/auth');
 const {
   getPosts,
   getPost,
@@ -11,12 +12,13 @@ const {
 
 const router = express.Router();
 
-router.get('/posts', getPosts);
+router.get('/posts', authenticate, getPosts);
 
-router.get('/posts/:id', getPost);
+router.get('/posts/:id', authenticate, getPost);
 
 router.post(
   '/posts',
+  authenticate,
   [
     body('title').trim().isLength({ min: 5 }),
     body('content').trim().isLength({ min: 5}),
@@ -26,6 +28,7 @@ router.post(
 
 router.put(
   '/posts/:id',
+  authenticate,
   [
     body('title').trim().isLength({ min: 5 }),
     body('content').trim().isLength({ min: 5}),
@@ -33,6 +36,6 @@ router.put(
   updatePost
 );
 
-router.delete('/posts/:id', deletePost);
+router.delete('/posts/:id', authenticate, deletePost);
 
 module.exports = router;

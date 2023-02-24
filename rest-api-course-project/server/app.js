@@ -86,7 +86,6 @@ app.use('/auth', authRoutes);
  * Setting up a catch all error middleware
 */
 app.use((error, request, response, next) => {
-  console.log('Error handling middleware: ', error);
   const { statusCode, message, info } = error;
 
   response.status(statusCode).json({ message, info });

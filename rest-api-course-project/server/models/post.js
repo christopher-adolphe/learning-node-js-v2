@@ -11,11 +11,12 @@ const postSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    required: true
+    required: true,
   },
   creator: {
-    type: Object,
-    required: true
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
   }
 }, { timestamps: true });
 
