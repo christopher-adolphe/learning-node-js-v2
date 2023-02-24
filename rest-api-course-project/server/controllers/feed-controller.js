@@ -13,6 +13,7 @@ const getPosts = async (request, response, next) => {
     const postCount = await Post.find().countDocuments();
     const posts = await Post
       .find()
+      .populate('creator')
       .skip((currentPage - 1) * postPerPage)
       .limit(postPerPage);
 
