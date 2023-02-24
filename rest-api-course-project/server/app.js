@@ -87,9 +87,9 @@ app.use('/auth', authRoutes);
 */
 app.use((error, request, response, next) => {
   console.log('Error handling middleware: ', error);
-  const { statusCode, message } = error;
+  const { statusCode, message, info } = error;
 
-  response.status(statusCode).json({ message });
+  response.status(statusCode).json({ message, info });
 });
 
 mongooseConnect(app, port);

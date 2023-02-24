@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const Post = require('../models/post');
 const { validationResult } = require('express-validator');
+
+const Post = require('../models/post');
 
 const getPosts = async (request, response, next) => {
   const currentPage = request.query.page || 1;
