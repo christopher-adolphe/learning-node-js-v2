@@ -5,6 +5,9 @@ const { validationResult } = require('express-validator');
 const Post = require('../models/post');
 const User = require('../models/user');
 
+// Importing the shared websocket connection
+const { getIO } = require('../socket');
+
 const getPosts = async (request, response, next) => {
   const currentPage = request.query.page || 1;
   const postPerPage = 2;
@@ -101,6 +104,20 @@ const createPost = async (request, response, next) => {
     await user.save();
 
     const result = await post.save();
+
+    /**
+     * Using the `emit()` method from socket.io to
+     * send a message to all connected clients to 
+     * inform them that a new post was created. The
+     * `emit()` method takes a 1st parameter a name
+     * which would represent the channel of the message
+     * and an object as 2nd parameter which we can use
+     * to send data to the connected clients
+    */
+    getIO.emit('posts', {
+      action: 'create',
+      post,
+    });
 
     response.status(201).json({
       message: 'New post successfully created',
