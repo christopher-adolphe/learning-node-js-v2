@@ -113,10 +113,21 @@ const createPost = async (request, response, next) => {
      * which would represent the channel of the message
      * and an object as 2nd parameter which we can use
      * to send data to the connected clients
+     * NOTE: The name of the action being emit from
+     * the server should be the same that the socket
+     * listens on the client; meanning:
+     * Server => getIO.emit('someName', { someData })
+     * Client => socket.on('someName' , () => { // Frontend logic });
     */
-    getIO.emit('posts', {
+    getIO().emit('posts', {
       action: 'create',
-      post,
+      post: {
+        ...post._doc,
+        creator: {
+          _id: user._id,
+          name: user.name,
+        },
+      },
     });
 
     response.status(201).json({
