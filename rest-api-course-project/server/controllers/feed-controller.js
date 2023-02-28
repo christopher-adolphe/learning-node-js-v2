@@ -5,6 +5,9 @@ const { validationResult } = require('express-validator');
 const Post = require('../models/post');
 const User = require('../models/user');
 
+// Importing the shared websocket connection
+const { getIO } = require('../socket');
+
 const getPosts = async (request, response, next) => {
   const currentPage = request.query.page || 1;
   const postPerPage = 2;
@@ -14,6 +17,7 @@ const getPosts = async (request, response, next) => {
     const posts = await Post
       .find()
       .populate('creator')
+      .sort({ createdAt: -1 })
       .skip((currentPage - 1) * postPerPage)
       .limit(postPerPage);
 
@@ -102,6 +106,31 @@ const createPost = async (request, response, next) => {
 
     const result = await post.save();
 
+    /**
+     * Using the `emit()` method from socket.io to
+     * send a message to all connected clients to 
+     * inform them that a new post was created. The
+     * `emit()` method takes a 1st parameter a name
+     * for the event being emitted
+     * and an object as 2nd parameter which we can use
+     * to send data to the connected clients
+     * NOTE: The name of the action being emit from
+     * the server should be the same that the socket
+     * listens on the client; meanning:
+     * Server => getIO.emit('someName', { someData })
+     * Client => socket.on('someName' , () => { // Frontend logic });
+    */
+    getIO().emit('posts', {
+      action: 'create',
+      post: {
+        ...post._doc,
+        creator: {
+          _id: user._id,
+          name: user.name,
+        },
+      },
+    });
+
     response.status(201).json({
       message: 'New post successfully created',
       post: result,
@@ -146,7 +175,7 @@ const updatePost = async (request, response, next) => {
       throw error;
     }
 
-    const post = await Post.findById(id);
+    const post = await Post.findById(id).populate('creator');
 
     if (!post) {
       const error = new Error(`Sorry, no post found with id: ${id}`);
@@ -156,7 +185,7 @@ const updatePost = async (request, response, next) => {
       throw error;
     }
 
-    if (post.creator.toString() !== request.userId) {
+    if (post.creator._id.toString() !== request.userId) {
       const error = new Error(`Sorry, you are not authorized to update post with id: ${id}.`);
 
       error.statusCode = 403;
@@ -184,6 +213,11 @@ const updatePost = async (request, response, next) => {
     }
 
     const result = await post.save();
+
+    getIO().emit('posts', {
+      action: 'update',
+      post: result,
+    });
 
     response.status(200).json({
       message: 'Post successfully updated',
@@ -229,7 +263,7 @@ const deletePost = async (request, response, next) => {
 
         error.statusCode = 500;
         
-        return next(error);
+        throw error;
       }
     });
 
@@ -245,6 +279,11 @@ const deletePost = async (request, response, next) => {
     user.posts.pull(id);
 
     await user.save();
+
+    getIO().emit('posts', {
+      action: 'delete',
+      post: id,
+    });
 
     response.status(200).json({
       message: `Post with id: ${id} successfully deleted`,

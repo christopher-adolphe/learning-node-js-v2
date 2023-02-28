@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import openSocket from 'socket.io-client';
 
 import Post from '../../components/Feed/Post/Post';
 import Button from '../../components/Button/Button';
@@ -39,6 +40,74 @@ class Feed extends Component {
       .catch(this.catchError);
 
     this.loadPosts();
+
+    /**
+     * Connecting the client to the socket. This
+     * function takes the server address as it's
+     * parameter
+    */
+    const socket = openSocket('http://localhost:8080');
+
+    /**
+     * Adding a listener on the websocket for the `posts`
+     * event name which is emitted from the server
+    */
+    socket.on('posts', data => {
+      const { action, post } = data;
+
+      switch (action) {
+        case 'create':
+          this.addPost(post);
+
+          break;
+
+        case 'update':
+          this.updatePost(post);
+          
+          break;
+
+        case 'delete':
+          this.loadPosts();
+          
+          break;
+      
+        default:
+          break;
+      }
+    });
+  }
+
+  addPost = post => {
+    this.setState(prevState => {
+      const updatedPosts = [ ...prevState.posts ];
+
+      if (prevState.postPage === 1) {
+        updatedPosts.pop();
+        updatedPosts.unshift(post);
+      }
+
+      return {
+        ...prevState,
+        posts: updatedPosts,
+        totalPosts: prevState.totalPosts + 1,
+      }
+    });
+  };
+
+  updatePost = post => {
+    this.setState(prevState => {
+      const updatedPosts = [ ...prevState.posts ];
+      const updatedPostIndex = updatedPosts.findIndex(updatedPost => updatedPost._id === post._id)
+
+      if (updatedPostIndex > -1) {
+        updatedPosts[updatedPostIndex] = post;
+      }
+
+      return {
+        ...prevState,
+        posts: updatedPosts,
+      };
+    });
   }
 
   loadPosts = direction => {
@@ -154,25 +223,15 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
-        const post = {
-          _id: resData.post._id,
-          title: resData.post.title,
-          content: resData.post.content,
-          creator: resData.post.creator,
-          createdAt: resData.post.createdAt
-        };
+        // const post = {
+        //   _id: resData.post._id,
+        //   title: resData.post.title,
+        //   content: resData.post.content,
+        //   creator: resData.post.creator,
+        //   createdAt: resData.post.createdAt
+        // };
         this.setState(prevState => {
-          let updatedPosts = [...prevState.posts];
-          if (prevState.editPost) {
-            const postIndex = prevState.posts.findIndex(
-              p => p._id === prevState.editPost._id
-            );
-            updatedPosts[postIndex] = post;
-          } else if (prevState.posts.length < 2) {
-            updatedPosts = prevState.posts.concat(post);
-          }
           return {
-            posts: updatedPosts,
             isEditing: false,
             editPost: null,
             editLoading: false
@@ -195,7 +254,6 @@ class Feed extends Component {
   };
 
   deletePostHandler = postId => {
-    console.log('deletePostHandler: ', postId);
     this.setState({ postsLoading: true });
     fetch(`http://localhost:8080/feed/posts/${postId}`, {
       method: 'DELETE',
@@ -210,10 +268,13 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
-        this.setState(prevState => {
-          const updatedPosts = prevState.posts.filter(p => p._id !== postId);
-          return { posts: updatedPosts, postsLoading: false };
-        });
+        console.log('deletePostHandler: ', resData);
+        // this.setState(prevState => {
+        //   const updatedPosts = prevState.posts.filter(p => p._id !== postId);
+        //   return { posts: updatedPosts, postsLoading: false };
+        // });
+
+        this.loadPosts();
       })
       .catch(err => {
         console.log(err);
