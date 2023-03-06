@@ -17,12 +17,15 @@ module.exports = {
     }
 
     try {
-      if (error.isLength > 0) {
+      if (errors.isLength > 0) {
         const error = new Error(('Invalid input'));
+
+        error.data = errors;
+        error.code = 422;
 
         throw error;
       }
-      
+
       const existingUser = await User.findOne({ email: email });
 
       if (existingUser) {

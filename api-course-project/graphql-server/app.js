@@ -76,6 +76,10 @@ app.use((request, response, next) => {
   */
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
+  if (request.method === 'POST') {
+    return response.status(200);
+  }
+
   next();
 });
 
@@ -83,6 +87,17 @@ app.use('/graphql', graphqlHTTP({
   schema: graphqlSchema,
   rootValue: graphqlResolver,
   graphiql: true,
+  formatError(error) {
+    if (!error.orignalError) {
+      return error;
+    }
+
+    const data = error.orignalError.data;
+    const message = error.message || 'An error occurred.';
+    const code = error.orignalError.code || 500;
+
+    return { message, data, status: code };
+  },
 }));
 
 /**
