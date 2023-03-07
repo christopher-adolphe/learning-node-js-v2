@@ -111,6 +111,19 @@ class Feed extends Component {
   }
 
   loadPosts = direction => {
+    const graphqlQuery = {
+      query: `
+        {
+          allposts {
+            _id
+            title
+            content
+            imageUrl,
+          }
+        }
+      `
+    };
+
     if (direction) {
       this.setState({ postsLoading: true, posts: [] });
     }
@@ -123,20 +136,22 @@ class Feed extends Component {
       page--;
       this.setState({ postPage: page });
     }
-    fetch(`http://localhost:8080/feed/posts?page=${page}`, {
+    fetch(`http://localhost:8080/graphql`, {
       headers: {
         Authorization: `Bearer ${this.props.token}`,
       }
     })
       .then(res => {
-        if (res.status !== 200) {
-          throw new Error('Failed to fetch posts.');
-        }
+        // if (res.status !== 200) {
+        //   throw new Error('Failed to fetch posts.');
+        // }
         return res.json();
       })
       .then(resData => {
+        const { allposts: posts } = resData.data;
+
         this.setState({
-          posts: resData.posts.map(post => ({
+          posts: posts.map(post => ({
             ...post,
             imagePath: post.imageUrl,
           })),
@@ -195,41 +210,74 @@ class Feed extends Component {
       editLoading: true
     });
     // Set up data (with image!)
-    const formData = new FormData();
-    let url = 'http://localhost:8080/feed/posts';
-    let method = 'POST';
+    // const formData = new FormData();
+    // let url = 'http://localhost:8080/graphql';
+    // let method = 'POST';
     const { title, content, image } = postData;
+    const graphqlQuery = {
+      query: `
+        mutation {
+          createPost(postInputData: { title: "${title}", content: "${content}", imageUrl: "${image}"}) {
+            _id
+            title
+            content
+            imageUrl
+            creator {
+              name
+            }
+            createdAt
+          }
+        }
+      `
+    };
 
-    formData.append('title', title);
-    formData.append('content', content);
-    formData.append('image', image);
+    // formData.append('title', title);
+    // formData.append('content', content);
+    // formData.append('image', image);
 
-    if (this.state.editPost) {
-      url = `http://localhost:8080/feed/posts/${this.state.editPost._id}`;
-      method = 'PUT';
-    }
+    // if (this.state.editPost) {
+    //   url = `http://localhost:8080/feed/posts/${this.state.editPost._id}`;
+    //   method = 'PUT';
+    // }
 
-    fetch(url, {
-      method,
-      body: formData,
+    fetch('http://localhost:8080/graphql', {
+      method: 'POST',
+      body: JSON.stringify(graphqlQuery),
       headers: {
         Authorization: `Bearer ${this.props.token}`,
+        'Content-Type': 'application/json',
       }
     })
       .then(res => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Creating or editing a post failed!');
-        }
+        // if (res.status !== 200 && res.status !== 201) {
+        //   throw new Error('Creating or editing a post failed!');
+        // }
         return res.json();
       })
       .then(resData => {
-        // const post = {
-        //   _id: resData.post._id,
-        //   title: resData.post.title,
-        //   content: resData.post.content,
-        //   creator: resData.post.creator,
-        //   createdAt: resData.post.createdAt
-        // };
+        if (resData.errors && resData.errors[0].status === 422) {
+          throw new Error(
+            "Validation failed. Make sure the title, content and image are filled!"
+          );
+        }
+
+        if (resData.errors) {
+          throw new Error(
+            "Sorry, an error occurred while creating post"
+          );
+        }
+
+        console.log(resData);
+        const { _id, title, content, creator, createdAt } = resData.data.createPost;
+
+        const post = {
+          _id,
+          title,
+          content,
+          creator,
+          createdAt
+        };
+
         this.setState(prevState => {
           return {
             isEditing: false,

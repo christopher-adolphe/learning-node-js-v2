@@ -10,11 +10,9 @@ const authenticate = (request, response, next) => {
     const authHeader = request.get('Authorization');
 
     if (!authHeader) {
-      const error = new Error('Sorry, user is not authenticated');
+      request.isAuth = false;
 
-      error.statusCode = 401;
-
-      throw error;
+      return next();
     }
     
     const token = authHeader.split(' ')[1];
@@ -27,22 +25,19 @@ const authenticate = (request, response, next) => {
     decodedToken = jwt.verify(token, 'myJwtSecretPrivateKey');
 
     if (!decodedToken) {
-      const error = new Error('Sorry, user is not authenticated');
+      request.isAuth = false;
 
-      error.statusCode = 401;
-
-      throw error;
+      return next();
     }
 
     request.userId = decodedToken.userId;
+    request.isAuth = true;
 
     next();
   } catch (error) {
-    if (!error.statusCode) {
-      error.statusCode = 500;
-    }
+    request.isAuth = false;
 
-    next(error);
+    return next();
   }
 };
 

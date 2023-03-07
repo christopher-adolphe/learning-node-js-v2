@@ -7,6 +7,7 @@ const { graphqlHTTP } = require('express-graphql');
 const mongooseConnect = require('./utils/database');
 const graphqlSchema = require('./graphql/schema');
 const graphqlResolver = require('./graphql/resolvers');
+const authenticate = require('./middleware/auth');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -68,7 +69,7 @@ app.use((request, response, next) => {
    * Specifying which http methods the client can use
    * our express application
   */
-  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, PATCH, DELETE');
 
   /**
    * Specifying some extra headers that the client can send
@@ -76,18 +77,20 @@ app.use((request, response, next) => {
   */
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  if (request.method === 'POST') {
-    return response.status(200);
+  if (request.method === 'OPTIONS') {
+    return response.sendStatus(200);
   }
 
   next();
 });
 
+app.use(authenticate);
+
 app.use('/graphql', graphqlHTTP({
   schema: graphqlSchema,
   rootValue: graphqlResolver,
   graphiql: true,
-  formatError(error) {
+  customFormatErrorFn(error) {
     if (!error.orignalError) {
       return error;
     }
