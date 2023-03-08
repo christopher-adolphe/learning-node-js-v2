@@ -142,8 +142,10 @@ module.exports = {
       updatedAt: createdPost.updatedAt.toISOString(),
     }
   },
-  allposts: async function(args, request) {
-    const { userId, isAuth } = request;
+  allposts: async function({ page }, request) {
+    const { isAuth } = request;
+    const currentPage = page || 1;
+    const postPerPage = 2;
 
     if (!isAuth) {
       const error = new Error(('Sorry, cannot get posts while not being authenticated'));
@@ -154,18 +156,51 @@ module.exports = {
     }
 
     const posts = await Post.find()
+      .populate('creator')
       .sort({ createdAt: -1 })
-      .populate('creator');
+      .skip((currentPage - 1) * postPerPage)
+      .limit(postPerPage);
 
     const totalItems = await Post.find().countDocuments();
 
     const formattedPosts = posts.map(post => ({
-      ...post,
+      ...post._doc,
       _id: post._id.toString(),
       createdAt: post.createdAt.toISOString(),
       updatedAt: post.updatedAt.toISOString(),
     }));
 
     return { posts: formattedPosts, totalItems };
+  },
+  post: async function({ postId }, request) {
+    const { isAuth } = request;
+
+    if (!isAuth) {
+      const error = new Error(('Sorry, cannot get post while not being authenticated'));
+
+      error.code = 401;
+
+      throw error;
+    }
+
+    const post = await Post.findById(postId).populate('creator');
+
+    if (!post) {
+      const error = new Error(`Sorry, no post found with id: ${postId}`);
+
+      error.statusCode = 404;
+
+      throw error;
+    }
+
+    const formattedPost = {
+      ...post._doc,
+      _id: post._id.toString(),
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
+    };
+    
+
+    return formattedPost;
   }
 };

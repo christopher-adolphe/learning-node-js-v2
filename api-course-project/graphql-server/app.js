@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -85,6 +86,37 @@ app.use((request, response, next) => {
 });
 
 app.use(authenticate);
+
+/**
+ * Creating a REST endpoint to handle image uploads
+*/
+const clearImage = filePath => {
+  filePath = path.join(__dirname, '..', filePath);
+
+  fs.unlink(filePath, error => console.log('An error occurred while deleting uploaded file'));
+};
+
+app.put('/post-image', (request, response, next) => {
+  const { isAuth } = request;
+  const { oldImagePath } = request.body;
+
+  if (!isAuth) {
+    throw new Error('Sorry, cannot upload files while not being authenticated');
+  }
+
+  if (!request.file) {
+    return response.status(200).json({ message: 'No file provided' });
+  }
+
+  if (oldImagePath) {
+    clearImage(oldImagePath);
+  }
+
+  return response.status(201).json({
+    message: 'File uploaded successfully',
+    filePath: request.file.path,
+  });
+});
 
 app.use('/graphql', graphqlHTTP({
   schema: graphqlSchema,
