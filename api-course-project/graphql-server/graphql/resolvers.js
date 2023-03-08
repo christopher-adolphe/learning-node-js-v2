@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
 
+const removeFile = require('../utils/removeFile');
+
 const User = require('../models/user');
 const Post = require('../models/post');
 
@@ -202,5 +204,171 @@ module.exports = {
     
 
     return formattedPost;
-  }
+  },
+  updatePost: async function({ postId, postInputData }, request) {
+    const { isAuth, userId } = request;
+    const { title, content, imageUrl } = postInputData;
+    const errors = [];
+
+    if (!isAuth) {
+      const error = new Error(('Sorry, cannot update post while not being authenticated'));
+
+      error.code = 401;
+
+      throw error;
+    }
+
+    const post = await Post.findById(postId).populate('creator');
+
+    if (!post) {
+      const error = new Error(`Sorry, no post found with id: ${postId}`);
+
+      error.statusCode = 404;
+
+      throw error;
+    }
+
+    if (post.creator._id.toString() !== userId.toString()) {
+      const error = new Error(`Sorry, you are not authorized to update post with id: ${postId}.`);
+
+      error.statusCode = 403;
+
+      throw error;
+    }
+
+    if (!validator.isEmpty(title) || !validator.isLength(title, { min: 5 })) {
+      errors.push({ message: 'Sorry title is compulsory and must be at least 5 characters long!' });
+    }
+
+    if (!validator.isEmpty(content) || !validator.isLength(content, { min: 5 })) {
+      errors.push({ message: 'Sorry content is compulsory and must be at least 5 characters long!' });
+    }
+
+    if (errors.isLength > 0) {
+      const error = new Error(('Invalid input'));
+
+      error.data = errors;
+      error.code = 422;
+
+      throw error;
+    }
+
+    post.title = title;
+    post.content = content;
+
+    if (imageUrl !== 'undefined') {
+      post.imageUrl = imageUrl;
+    }
+
+    const updatedPost = await post.save();
+
+    return {
+      ...updatedPost._doc,
+      _id: updatedPost._id.toString(),
+      createdAt: updatedPost.createdAt.toISOString(),
+      updatedAt: updatedPost.updatedAt.toISOString(),
+    };
+  },
+  deletePost: async function({ postId }, request) {
+    const { isAuth, userId } = request;
+
+    if (!isAuth) {
+      const error = new Error(('Sorry, cannot delete post while not being authenticated'));
+
+      error.code = 401;
+
+      throw error;
+    }
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      const error = new Error(`Sorry, no post found with id: ${postId}`);
+
+      error.statusCode = 404;
+
+      throw error;
+    }
+
+    if (post.creator.toString() !== userId.toString()) {
+      const error = new Error(`Sorry, you are not authorized to delete post with id: ${postId}.`);
+
+      error.statusCode = 403;
+
+      throw error;
+    }
+
+    const deletedPost = await Post.deleteOne({ _id: postId });
+
+    removeFile(post.imageUrl);
+
+    const user = await User.findById(userId);
+
+    user.posts.pull(postId);
+
+    await user.save();
+
+    return deletedPost.deletedCount;
+  },
+  user: async function(args, request) {
+    const { isAuth, userId } = request;
+
+    if (!isAuth) {
+      const error = new Error(('Sorry, cannot get user details while not being authenticated'));
+
+      error.code = 401;
+
+      throw error;
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      const error = new Error((`Sorry, could not find user with id: ${userId}`));
+
+      error.code = 404;
+
+      throw error;
+    }
+
+    return {
+      ...user._doc,
+      _id: user._id.toString(),
+    };
+  },
+  updateStatus: async function({ status }, request) {
+    const { isAuth, userId } = request;
+    const errors = [];
+
+    if (!isAuth) {
+      const error = new Error(('Sorry, cannot update status while not being authenticated'));
+
+      error.code = 401;
+
+      throw error;
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      const error = new Error((`Sorry, could not find user with id: ${userId}`));
+
+      error.code = 404;
+
+      throw error;
+    }
+
+    if (!validator.isEmpty(status) || !validator.isLength(status, { min: 5 })) {
+      errors.push({ message: 'Sorry status is compulsory and must be at least 5 characters long!' });
+    }
+
+    user.status = status;
+
+    const updatedUser = await user.save();
+
+    return {
+      ...updatedUser._doc,
+      _id: updatedUser._id.toString(),
+    };
+  },
 };

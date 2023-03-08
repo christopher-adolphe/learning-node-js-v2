@@ -1,10 +1,10 @@
-const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const { graphqlHTTP } = require('express-graphql');
 
+const removeFile = require('./utils/removeFile');
 const mongooseConnect = require('./utils/database');
 const graphqlSchema = require('./graphql/schema');
 const graphqlResolver = require('./graphql/resolvers');
@@ -90,12 +90,6 @@ app.use(authenticate);
 /**
  * Creating a REST endpoint to handle image uploads
 */
-const clearImage = filePath => {
-  filePath = path.join(__dirname, '..', filePath);
-
-  fs.unlink(filePath, error => console.log('An error occurred while deleting uploaded file'));
-};
-
 app.put('/post-image', (request, response, next) => {
   const { isAuth } = request;
   const { oldImagePath } = request.body;
@@ -109,7 +103,7 @@ app.put('/post-image', (request, response, next) => {
   }
 
   if (oldImagePath) {
-    clearImage(oldImagePath);
+    removeFile(oldImagePath);
   }
 
   return response.status(201).json({
