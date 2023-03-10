@@ -1,9 +1,15 @@
+const fs = require('fs');
+const path = require('path');
+
 const express = require('express');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
 const multer = require('multer');
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
 
 /**
  * Using the `diskStorage()` method from the
@@ -41,13 +47,12 @@ const fileFilter = (request, file, doneCallback) => {
 
 const addLocals = require('./middleware/addLocals');
 
-const path = require('path');
 const mongooseConnect = require('./utils/database');
 const User = require('./models/user');
 
 const app = express();
 const store = new MongoDBStore({
-  uri: 'mongodb://localhost:27017/online_shop',
+  uri: `mongodb://localhost:27017/${process.env.MONGO_DATABASE}`,
   collection: 'sessions',
 });
 /**
@@ -77,6 +82,27 @@ app.use(multer({
   storage: fileStorage,
   fileFilter,
 }).single('image'));
+
+/**
+ * Using `helmet` to set secure response headers
+*/
+app.use(helmet());
+
+/**
+ * Using `compression` to compress assets being
+ * served by the app
+*/
+app.use(compression());
+
+
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, 'access.log'),
+  { flags: 'a' }
+);
+/**
+ * Using `morgan` to logging to the application
+*/
+app.use(morgan('combined', { stream: accessLogStream }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
