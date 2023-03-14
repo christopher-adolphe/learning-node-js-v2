@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 
-const authenticate = require('../middleware/auth');
+const authMiddleware = require('../middleware/is-auth');
 
 it('should throw an error given request does not contain authorization header set', function() {
   const request = {
@@ -9,5 +9,5 @@ it('should throw an error given request does not contain authorization header se
     },
   };
 
-  expect(authenticate.bind(this, request, {}, () => {})).to.throw('Sorry, user is not authenticated');
+  expect(() => authMiddleware(request, {}, () => {})).to.throw('Not authenticated.');
 });

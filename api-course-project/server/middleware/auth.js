@@ -42,8 +42,10 @@ const authenticate = (request, response, next) => {
       error.statusCode = 500;
     }
 
-    next(error);
+    throw(error);
   }
+
+  next();
 };
 
 module.exports = authenticate;
