@@ -77,17 +77,21 @@ const signIn = async (request, response, next) => {
       }
     );
 
-    return response.status(200).json({
+    response.status(200).json({
       message: 'User successfully signed in',
       userId: user._id,
       token
     });
+
+    return;
   } catch (error) {
     if (!error.statusCode) {
       error.statusCode = 500;
     }
 
     next(error);
+
+    return error;
   }
 };
 
@@ -105,7 +109,7 @@ const getStatus = async (request, response, next) => {
       throw error;
     }
 
-    return response.status(200).json({
+    response.status(200).json({
       status: user.status, 
     });
   } catch (error) {

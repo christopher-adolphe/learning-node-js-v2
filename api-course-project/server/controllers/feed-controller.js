@@ -102,7 +102,7 @@ const createPost = async (request, response, next) => {
      * model
     */
     user.posts.push(post);
-    await user.save();
+    const updatedUser = await user.save();
 
     const result = await post.save();
 
@@ -139,6 +139,8 @@ const createPost = async (request, response, next) => {
         name: user.name,
       },
     });
+
+    return updatedUser;
   } catch (error) {
     if (!error.statusCode) {
       error.statusCode = 500;
