@@ -109,7 +109,7 @@ const getStatus = async (request, response, next) => {
       throw error;
     }
 
-    return response.status(200).json({
+    response.status(200).json({
       status: user.status, 
     });
   } catch (error) {
