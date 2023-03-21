@@ -1,12 +1,27 @@
-var num1Elem = document.getElementById('num1');
-var num2Elem = document.getElementById('num2');
-var btnElem = document.querySelector('button');
-var paragraphElem = document.querySelector('p');
+"use strict";
+const num1Elem = document.getElementById('num1');
+const num2Elem = document.getElementById('num2');
+const btnElem = document.querySelector('button');
+const paragraphElem = document.querySelector('p');
+const resultList = [];
 function add(num1, num2) {
     return num1 + num2;
 }
-btnElem === null || btnElem === void 0 ? void 0 : btnElem.addEventListener('click', function () {
-    var result = add(+(num1Elem === null || num1Elem === void 0 ? void 0 : num1Elem.value), +(num2Elem === null || num2Elem === void 0 ? void 0 : num2Elem.value));
+function printVal(resultObj) {
+    console.log(resultObj.val);
+}
+btnElem.addEventListener('click', () => {
+    const result = add(+num1Elem.value, +num2Elem.value);
+    resultList.push(result);
     console.log('result: ', result);
-    paragraphElem === null || paragraphElem === void 0 ? void 0 : paragraphElem.innerText = result;
+    console.log('resultList: ', resultList);
+    printVal({ val: result, timestamp: new Date() });
+});
+const myPromise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        resolve('Promise is resolved!!');
+    }, 1500);
+});
+myPromise.then(result => {
+    console.log('Result: ', result);
 });
