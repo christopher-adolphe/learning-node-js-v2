@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-// const uri = "mongodb+srv://online-shop-admin:kqOt3IBqrR3IbQkZ@christopher-db.vztrg.mongodb.net/?retryWrites=true&w=majority";
 const uri = 'mongodb://localhost:27017/online_shop';
 // const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 const User = require('../models/user');
