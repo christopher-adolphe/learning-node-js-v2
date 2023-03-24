@@ -8,11 +8,11 @@ const { validationResult } = require('express-validator/check');
 const User = require('../models/user');
 // const transporter = nodemailer.createTransport(sendGridTransport({
 //   auth: {
-//     api_key: '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',
+//     api_key: 'sendgrid-api-key',
 //   },
 // }));
 
-// sendGridMail.setApiKey('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');
+// sendGridMail.setApiKey('sendgrid-api-key');
 const transporter = nodemailer.createTransport({
   host: "sandbox.smtp.mailtrap.io",
   port: 2525,
